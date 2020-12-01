@@ -12,14 +12,14 @@ pub fn star_one(input: &str) -> usize {
 }
 
 pub fn star_two(input: &str) -> usize {
-  input
-  .lines()
-  .map(|x| x.parse::<usize>().unwrap())
-  .permutations(3)
-  .filter(|x| x.iter().sum::<usize>() == 2020)
-  .next()
-  .map(|x| x.iter().product())
-  .expect("Could not find numbers")
+    input
+        .lines()
+        .map(|x| x.parse::<usize>().unwrap())
+        .permutations(3)
+        .filter(|x| x.iter().sum::<usize>() == 2020)
+        .next()
+        .map(|x| x.iter().product())
+        .expect("Could not find numbers")
 }
 
 #[cfg(test)]
