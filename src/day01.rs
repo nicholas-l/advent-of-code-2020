@@ -1,9 +1,10 @@
 use itertools::Itertools;
+use std::io::BufRead;
 
-fn get_product_matching_sum(input: &str, length: usize, sum: usize) -> usize {
+fn get_product_matching_sum(input: impl BufRead, length: usize, sum: usize) -> usize {
     input
         .lines()
-        .map(|x| x.parse::<usize>().unwrap())
+        .map(|x| x.unwrap().parse::<usize>().unwrap())
         .permutations(length)
         .filter(|x| x.iter().sum::<usize>() == sum)
         .next()
@@ -12,26 +13,33 @@ fn get_product_matching_sum(input: &str, length: usize, sum: usize) -> usize {
 }
 
 #[allow(dead_code)]
-pub fn star_one(input: &str) -> usize {
+pub fn star_one(input: impl BufRead) -> usize {
     get_product_matching_sum(input, 2, 2020)
 }
 
 #[allow(dead_code)]
-pub fn star_two(input: &str) -> usize {
+pub fn star_two(input: impl BufRead) -> usize {
     get_product_matching_sum(input, 3, 2020)
 }
 
 #[cfg(test)]
 mod tests {
     use super::{star_one, star_two};
+    use std::io::Cursor;
 
     #[test]
     fn test_star_one() {
-        assert_eq!(star_one("1721\n979\n366\n299\n675\n1456"), 514579);
+        assert_eq!(
+            star_one(Cursor::new(b"1721\n979\n366\n299\n675\n1456")),
+            514579
+        );
     }
 
     #[test]
     fn test_star_two() {
-        assert_eq!(star_two("1721\n979\n366\n299\n675\n1456"), 241861950);
+        assert_eq!(
+            star_two(Cursor::new(b"1721\n979\n366\n299\n675\n1456")),
+            241861950
+        );
     }
 }
