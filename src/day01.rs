@@ -11,10 +11,12 @@ fn get_product_matching_sum(input: &str, length: usize, sum: usize) -> usize {
         .expect("Could not find numbers")
 }
 
+#[allow(dead_code)]
 pub fn star_one(input: &str) -> usize {
     get_product_matching_sum(input, 2, 2020)
 }
 
+#[allow(dead_code)]
 pub fn star_two(input: &str) -> usize {
     get_product_matching_sum(input, 3, 2020)
 }
