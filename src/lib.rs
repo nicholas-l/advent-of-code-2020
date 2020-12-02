@@ -1,8 +1,9 @@
 #[macro_use]
 extern crate lazy_static;
 
-mod day01;
-mod day02;
+pub mod day01;
+pub mod day02;
+pub mod day03;
 
 #[cfg(test)]
 mod tests {
