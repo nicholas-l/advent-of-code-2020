@@ -1,25 +1,22 @@
 use itertools::Itertools;
 
-pub fn star_one(input: &str) -> usize {
+fn get_product_matching_sum(input: &str, length: usize, sum: usize) -> usize {
     input
         .lines()
         .map(|x| x.parse::<usize>().unwrap())
-        .permutations(2)
-        .filter(|x| x[0] + x[1] == 2020)
-        .next()
-        .map(|x| x[0] * x[1])
-        .expect("Could not find numbers")
-}
-
-pub fn star_two(input: &str) -> usize {
-    input
-        .lines()
-        .map(|x| x.parse::<usize>().unwrap())
-        .permutations(3)
-        .filter(|x| x.iter().sum::<usize>() == 2020)
+        .permutations(length)
+        .filter(|x| x.iter().sum::<usize>() == sum)
         .next()
         .map(|x| x.iter().product())
         .expect("Could not find numbers")
+}
+
+pub fn star_one(input: &str) -> usize {
+    get_product_matching_sum(input, 2, 2020)
+}
+
+pub fn star_two(input: &str) -> usize {
+    get_product_matching_sum(input, 3, 2020)
 }
 
 #[cfg(test)]
