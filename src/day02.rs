@@ -53,8 +53,8 @@ pub fn star_two(input: impl BufRead) -> usize {
 
 #[cfg(test)]
 mod tests {
-    use super::{star_one, star_two};
     use std::io::Cursor;
+    use super::{star_one, star_two};
 
     #[test]
     fn test_star_one() {
