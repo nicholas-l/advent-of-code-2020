@@ -32,4 +32,17 @@ mod tests {
         let input = BufReader::new(f);
         assert_eq!(star_two(input), 267);
     }
+
+    #[test]
+    fn day03_complete() {
+        use crate::day03::{star_one, star_two};
+
+        let f = fs::File::open("day03.txt").unwrap();
+        let input = BufReader::new(f);
+        assert_eq!(star_one(input), 145);
+
+        let f = fs::File::open("day03.txt").unwrap();
+        let input = BufReader::new(f);
+        assert_eq!(star_two(input), 3424528800);
+    }
 }

@@ -8,7 +8,12 @@ use advent_of_code_2020::*;
 type DayFn = fn(Box<dyn BufRead>) -> usize;
 
 fn main() {
-    let days: Vec<String> = env::args().skip(1).collect();
+    let args: Vec<String> = env::args().skip(1).collect();
+    let days = if args.len() == 1 && args[0] == "all" {
+        (1..=3).map(|x| x.to_string()).collect()
+    } else {
+        args
+    };
     for day in days {
         let (star_one, star_two, filename) = match day.as_str() {
             "1" => {
@@ -19,13 +24,12 @@ fn main() {
                 use day02::{star_one, star_two};
                 (star_one as DayFn, star_two as DayFn, "day02.txt")
             }
-            // "3" => {
-            //   use day03::{star_one, star_two};
-            //   (star_one, star_two, "day01.txt")
-
-            // },
-            _ => {
-                unimplemented!();
+            "3" => {
+                use day03::{star_one, star_two};
+                (star_one as DayFn, star_two as DayFn, "day03.txt")
+            }
+            x => {
+                unimplemented!("Have not implemented day {}", x);
             }
         };
 
