@@ -1,6 +1,5 @@
 use regex::Regex;
 use std::collections::{HashMap, HashSet};
-use std::convert::TryFrom;
 use std::io::BufRead;
 use std::str::FromStr;
 
@@ -14,77 +13,189 @@ fn is_seperator(c: char) -> bool {
     c == ' ' || c == '\n'
 }
 
-// struct Passport {
-//     birth_year: BirthYear,
-// }
+#[derive(Debug)]
+enum Unit {
+    Centimeter,
+    Inch,
+}
 
-// impl FromStr for Passport {
-//     fn from_str(s: &str) -> Result<Self, Self::Err> {
-//         match key {
-//             "byr" => {
-//                 value.len() == 4
-//                     && value
-//                         .parse::<usize>()
-//                         .map(|x| x >= 1920 && x <= 2002)
-//                         .unwrap_or(false)
-//             }
-//             "iyr" => {
-//                 value.len() == 4
-//                     && value
-//                         .parse::<usize>()
-//                         .map(|x| x >= 2010 && x <= 2020)
-//                         .unwrap_or(false)
-//             }
-//             "eyr" => {
-//                 value.len() == 4
-//                     && value
-//                         .parse::<usize>()
-//                         .map(|x| x >= 2020 && x <= 2030)
-//                         .unwrap_or(false)
-//             }
-//             "hgt" => HEIGHT_REGEX
-//                 .captures(&value)
-//                 .map(|captures| {
-//                     let value = captures
-//                         .name("value")
-//                         .expect("Unable to get value")
-//                         .as_str()
-//                         .parse::<usize>()
-//                         .expect("Unable to parse value");
-//                     let unit = captures
-//                         .name("unit")
-//                         .expect("Unable to parse unit")
-//                         .as_str();
+impl FromStr for Unit {
+    type Err = String;
 
-//                     match unit {
-//                         "cm" => value >= 150 && value <= 193,
-//                         "in" => value >= 59 && value <= 76,
-//                         _ => {
-//                             let message = format!("{} {}", value, unit);
-//                             panic!(message)
-//                         }
-//                     }
-//                 })
-//                 .unwrap_or(false),
-//             "hcl" => {
-//                 // # followed by exactly six characters 0-9 or a-f.
-//                 COLOUR.is_match(value)
-//             }
-//             "ecl" => {
-//                 // exactly one of: amb blu brn gry grn hzl oth.
-//                 EYE_COLOUR.is_match(value)
-//             }
-//             "pid" => {
-//                 // a nine-digit number, including leading zeroes
-//                 value.len() == 9 && value.chars().all(char::is_numeric)
-//             }
-//             "cid" => true,
-//             _ => panic!("Invalid key"),
-//         };
-//     }
-// }
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "cm" => Ok(Unit::Centimeter),
+            "in" => Ok(Unit::Inch),
+            _ => Err(format!("Cannot convert {} to Unit", s)),
+        }
+    }
+}
 
-const valid_sections: [&str; 7] = [
+#[derive(Debug)]
+struct Length {
+    value: usize,
+    unit: Unit,
+}
+
+impl Length {
+    fn is_valid(&self) -> bool {
+        match self.unit {
+            Unit::Centimeter => self.value >= 150 && self.value <= 193,
+            Unit::Inch => self.value >= 59 && self.value <= 76,
+        }
+    }
+}
+
+impl FromStr for Length {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        HEIGHT_REGEX
+            .captures(s)
+            .ok_or("Wrong format for length".to_string())
+            .map(|captures| {
+                Ok(Length {
+                    value: captures
+                        .name("value")
+                        .ok_or("Unable to get value when parsing length".to_string())
+                        .and_then(|value| {
+                            value.as_str().parse().map_err(|_e| {
+                                format!(
+                                    "Unable to parse value when parsing length for {}",
+                                    value.as_str()
+                                )
+                            })
+                        })?,
+                    unit: captures
+                        .name("unit")
+                        .ok_or("Unable to get unit when parsing length".to_string())
+                        .and_then(|value| {
+                            value.as_str().parse().map_err(|_e| {
+                                format!(
+                                    "Unable to parse unit when parsing length for {}",
+                                    value.as_str()
+                                )
+                            })
+                        })?,
+                })
+            })?
+    }
+}
+#[derive(Debug)]
+enum Colour {
+    RGB(usize, usize, usize),
+}
+
+impl FromStr for Colour {
+    type Err = String;
+
+    fn from_str(_s: &str) -> Result<Self, Self::Err> {
+        Ok(Colour::RGB(0, 0, 0))
+    }
+}
+
+#[derive(Debug)]
+struct Passport {
+    birth_year: usize,
+    issue_year: usize,
+    expiry_year: usize,
+    height: Length,
+    hair_colour: String,
+    eye_colour: String,
+    personal_id: String,
+}
+
+impl Passport {
+    fn is_valid(&self) -> bool {
+        self.birth_year >= 1920
+            && self.birth_year <= 2002
+            && self.issue_year >= 2010
+            && self.issue_year <= 2020
+            && self.expiry_year >= 2020
+            && self.expiry_year <= 2030
+            && self.height.is_valid()
+            && COLOUR.is_match(&self.hair_colour)
+            && EYE_COLOUR.is_match(&self.eye_colour)
+            && self.personal_id.len() == 9
+            && self.personal_id.chars().all(char::is_numeric)
+    }
+}
+
+impl FromStr for Passport {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let hm: HashMap<&str, &str> = s
+            .split(is_seperator)
+            .map(|section| {
+                let mut iter = section.splitn(2, ':');
+                let first = iter.next().unwrap();
+
+                (first, iter.next().expect(section))
+            })
+            .collect();
+        Ok(Passport {
+            birth_year: hm
+                .get("byr")
+                .ok_or("Unable to get birth year".to_string())
+                .and_then(|value| {
+                    value
+                        .parse()
+                        .map_err(|_e| format!("Unable to parse birth year for {}", value))
+                })?,
+            issue_year: hm
+                .get("iyr")
+                .ok_or("Unable to get issue year".to_string())
+                .and_then(|value| {
+                    value
+                        .parse()
+                        .map_err(|_e| format!("Unable to parse issue year for {}", value))
+                })?,
+            expiry_year: hm
+                .get("eyr")
+                .ok_or("Unable to get expiry year".to_string())
+                .and_then(|value| {
+                    value
+                        .parse()
+                        .map_err(|_e| format!("Unable to parse expiry year for {}", value))
+                })?,
+            height: hm
+                .get("hgt")
+                .ok_or("Unable to get height".to_string())
+                .and_then(|value| {
+                    value
+                        .parse::<Length>()
+                        .map_err(|e| format!("Unable to parse height for {}: {}", value, e))
+                })?,
+            hair_colour: hm
+                .get("hcl")
+                .ok_or("Unable to get hair colour".to_string())
+                .and_then(|value| {
+                    value
+                        .parse()
+                        .map_err(|_e| format!("Unable to parse hair colour for {}", value))
+                })?,
+            eye_colour: hm
+                .get("ecl")
+                .ok_or("Unable to get eye colour".to_string())
+                .and_then(|value| {
+                    value
+                        .parse()
+                        .map_err(|_e| format!("Unable to parse eye colour for {}", value))
+                })?,
+            personal_id: hm
+                .get("pid")
+                .ok_or("Unable to get personal id".to_string())
+                .and_then(|value| {
+                    value
+                        .parse()
+                        .map_err(|_e| format!("Unable to parse personal id for {}", value))
+                })?,
+        })
+    }
+}
+
+const VALID_SECTIONS: [&str; 7] = [
     "byr", // (Birth Year)
     "iyr", // (Issue Year)
     "eyr", // (Expiration Year)
@@ -95,18 +206,12 @@ const valid_sections: [&str; 7] = [
            // "cid", // (Country ID)
 ];
 
-fn is_valid(passport: &str) -> bool {
-    let keys: HashSet<&str> = passport
-        .split(is_seperator)
-        .map(|section| section.split(':').next().unwrap())
-        .collect();
-    valid_sections.iter().all(|s| keys.contains(s))
-}
-
 #[allow(dead_code, unused_variables)]
 pub fn star_one(mut input: impl BufRead) -> usize {
     let mut input_str = String::new();
-    input.read_to_string(&mut input_str);
+    input
+        .read_to_string(&mut input_str)
+        .expect("Could not read all of string");
     input_str
         .split("\n\n")
         .filter(|&passport| {
@@ -114,7 +219,7 @@ pub fn star_one(mut input: impl BufRead) -> usize {
                 .split(is_seperator)
                 .map(|section| section.split(':').next().unwrap())
                 .collect();
-            valid_sections.iter().all(|s| keys.contains(s))
+            VALID_SECTIONS.iter().all(|s| keys.contains(s))
         })
         .count()
 }
@@ -122,87 +227,14 @@ pub fn star_one(mut input: impl BufRead) -> usize {
 #[allow(dead_code, unused_variables)]
 pub fn star_two(mut input: impl BufRead) -> usize {
     let mut input_str = String::new();
-    input.read_to_string(&mut input_str);
-    let is_valid = |(&key, value): (&&str, &&str)| match key {
-        "byr" => {
-            value.len() == 4
-                && value
-                    .parse::<usize>()
-                    .map(|x| x >= 1920 && x <= 2002)
-                    .unwrap_or(false)
-        }
-        "iyr" => {
-            value.len() == 4
-                && value
-                    .parse::<usize>()
-                    .map(|x| x >= 2010 && x <= 2020)
-                    .unwrap_or(false)
-        }
-        "eyr" => {
-            value.len() == 4
-                && value
-                    .parse::<usize>()
-                    .map(|x| x >= 2020 && x <= 2030)
-                    .unwrap_or(false)
-        }
-        "hgt" => HEIGHT_REGEX
-            .captures(&value)
-            .map(|captures| {
-                let value = captures
-                    .name("value")
-                    .expect("Unable to get value")
-                    .as_str()
-                    .parse::<usize>()
-                    .expect("Unable to parse value");
-                let unit = captures
-                    .name("unit")
-                    .expect("Unable to parse unit")
-                    .as_str();
-
-                match unit {
-                    "cm" => value >= 150 && value <= 193,
-                    "in" => value >= 59 && value <= 76,
-                    _ => {
-                        let message = format!("{} {}", value, unit);
-                        panic!(message)
-                    }
-                }
-            })
-            .unwrap_or(false),
-        "hcl" => {
-            // # followed by exactly six characters 0-9 or a-f.
-            COLOUR.is_match(value)
-        }
-        "ecl" => {
-            // exactly one of: amb blu brn gry grn hzl oth.
-            EYE_COLOUR.is_match(value)
-        }
-        "pid" => {
-            // a nine-digit number, including leading zeroes
-            value.len() == 9 && value.chars().all(char::is_numeric)
-        }
-        "cid" => true,
-        _ => panic!("Invalid key"),
-    };
+    input
+        .read_to_string(&mut input_str)
+        .expect("Could not read all of string");
     input_str
         .split("\n\n")
-        .filter(|&passport| {
-            let keys: HashMap<&str, &str> = passport
-                .split(is_seperator)
-                .inspect(|x| println!("{}", x))
-                .map(|section| {
-                    let mut iter = section.splitn(2, ':');
-                    let first = iter.next().unwrap();
-
-                    (first, iter.next().expect(section))
-                })
-                .collect();
-            valid_sections.iter().all(|s| keys.contains_key(s))
-                && keys
-                    .iter()
-                    .inspect(|x| println!("isValid: {:?}", x))
-                    .all(is_valid)
-        })
+        .filter_map(|passport| passport.parse::<Passport>().ok())
+        .inspect(|x| println!("{:?}: {}", x, x.is_valid()))
+        .filter(|p| p.is_valid())
         .count()
 }
 
