@@ -10,7 +10,7 @@ type DayFn = fn(Box<dyn BufRead>) -> usize;
 fn main() {
     let args: Vec<String> = env::args().skip(1).collect();
     let days = if args.len() == 1 && args[0] == "all" {
-        (1..=3).map(|x| x.to_string()).collect()
+        (1..=4).map(|x| x.to_string()).collect()
     } else {
         args
     };
@@ -27,6 +27,10 @@ fn main() {
             "3" => {
                 use day03::{star_one, star_two};
                 (star_one as DayFn, star_two as DayFn, "day03.txt")
+            }
+            "4" => {
+                use day04::{star_one, star_two};
+                (star_one as DayFn, star_two as DayFn, "day04.txt")
             }
             x => {
                 unimplemented!("Have not implemented day {}", x);
