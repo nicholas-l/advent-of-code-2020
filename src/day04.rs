@@ -9,10 +9,6 @@ lazy_static! {
     static ref EYE_COLOUR: Regex = Regex::new(r"^amb|blu|brn|gry|grn|hzl|oth$").unwrap();
 }
 
-fn is_seperator(c: char) -> bool {
-    c == ' ' || c == '\n'
-}
-
 #[derive(Debug)]
 enum Unit {
     Centimeter,
@@ -126,7 +122,7 @@ impl FromStr for Passport {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let hm: HashMap<&str, &str> = s
-            .split(is_seperator)
+            .split_whitespace()
             .map(|section| {
                 let mut iter = section.splitn(2, ':');
                 let first = iter.next().unwrap();
@@ -216,7 +212,7 @@ pub fn star_one(mut input: impl BufRead) -> usize {
         .split("\n\n")
         .filter(|&passport| {
             let keys: HashSet<&str> = passport
-                .split(is_seperator)
+                .split_whitespace()
                 .map(|section| section.split(':').next().unwrap())
                 .collect();
             VALID_SECTIONS.iter().all(|s| keys.contains(s))
