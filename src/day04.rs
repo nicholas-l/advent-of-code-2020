@@ -233,7 +233,6 @@ pub fn star_two(mut input: impl BufRead) -> usize {
     input_str
         .split("\n\n")
         .filter_map(|passport| passport.parse::<Passport>().ok())
-        .inspect(|x| println!("{:?}: {}", x, x.is_valid()))
         .filter(|p| p.is_valid())
         .count()
 }
