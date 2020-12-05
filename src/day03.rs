@@ -1,11 +1,14 @@
 use std::io::BufRead;
 
-fn get_path<'a, 'b>(map: &'a Vec<Vec<char>>, movement: &'b (usize, usize)) -> Vec<char> {
+fn get_path<'a>(
+    map: &'a Vec<Vec<char>>,
+    delta_y: usize,
+    delta_x: usize,
+) -> impl Iterator<Item = char> + 'a {
     map.iter()
         .enumerate()
-        .filter(|(y, _)| y % movement.0 == 0)
-        .map(|(y, row)| row[(y / movement.0 * movement.1) % row.len()])
-        .collect()
+        .filter(move |y| y.0 % delta_y == 0)
+        .map(move |(y, row)| row[(y / delta_y * delta_x) % row.len()])
 }
 
 #[allow(dead_code, unused_variables)]
@@ -16,13 +19,7 @@ pub fn star_one(input: impl BufRead) -> usize {
         .collect();
 
     (1..map[0].len())
-        .map(|movement| {
-            let movement = (1, movement);
-            get_path(&map, &movement)
-                .into_iter()
-                .filter(|&x| x == '#')
-                .count()
-        })
+        .map(|movement| get_path(&map, 1, movement).filter(|&x| x == '#').count())
         .max()
         .unwrap()
 }
@@ -37,8 +34,7 @@ pub fn star_two(input: impl BufRead) -> usize {
     movements
         .into_iter()
         .map(|movement| {
-            get_path(&map, &movement)
-                .into_iter()
+            get_path(&map, movement.0, movement.1)
                 .filter(|&x| x == '#')
                 .count()
         })
