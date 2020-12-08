@@ -84,7 +84,7 @@ pub fn star_two(input: impl BufRead) -> usize {
         .filter_map(Result::ok)
         .map(|x| x.parse().unwrap())
         .collect();
-    let instructions_to_flip: Vec<usize> = instructions
+    instructions
         .iter()
         .enumerate()
         // Remove acculumator instructions
@@ -93,9 +93,6 @@ pub fn star_two(input: impl BufRead) -> usize {
             _ => true,
         })
         .map(|x| x.0)
-        .collect();
-    instructions_to_flip
-        .into_iter()
         .filter_map(|index| run(&instructions, index).ok())
         .next()
         .unwrap()
