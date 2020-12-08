@@ -44,6 +44,10 @@ fn main() {
                 use day07::{star_one, star_two};
                 (star_one as DayFn, star_two as DayFn, "day07.txt")
             }
+            "8" => {
+                use day08::{star_one, star_two};
+                (star_one as DayFn, star_two as DayFn, "day08.txt")
+            }
             x => {
                 unimplemented!("Have not implemented day {}", x);
             }
