@@ -37,7 +37,6 @@ pub fn star_two(mut input: impl BufRead) -> usize {
                     None => Some(person),
                 })
         })
-        .inspect(|x| println!("{:?}", x))
         .map(|x| x.unwrap().len())
         .sum()
 }
