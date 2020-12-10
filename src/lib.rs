@@ -1,3 +1,5 @@
+#![feature(map_first_last)]
+
 #[macro_use]
 extern crate lazy_static;
 
@@ -10,6 +12,7 @@ pub mod day06;
 pub mod day07;
 pub mod day08;
 pub mod day09;
+pub mod day10;
 
 #[cfg(test)]
 mod tests {
@@ -128,5 +131,18 @@ mod tests {
         let f = fs::File::open("day09.txt").unwrap();
         let input = BufReader::new(f);
         assert_eq!(star_two(input), 2186361);
+    }
+
+    #[test]
+    fn day10_complete() {
+        use crate::day10::{star_one, star_two};
+
+        let f = fs::File::open("day10.txt").unwrap();
+        let input = BufReader::new(f);
+        assert_eq!(star_one(input), 2201);
+
+        let f = fs::File::open("day10.txt").unwrap();
+        let input = BufReader::new(f);
+        assert_eq!(star_two(input), 169255295254528);
     }
 }
