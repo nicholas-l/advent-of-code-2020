@@ -44,7 +44,7 @@ impl Debug for SeatStatus {
     }
 }
 
-fn get_new_state(map: &Vec<Vec<SeatStatus>>, y: usize, x: usize) -> SeatStatus {
+fn get_new_state(map: &SeatMap, y: usize, x: usize) -> SeatStatus {
     let mut count = 0;
     let dirs: [(isize, isize); 8] = [
         (-1, -1),
@@ -80,7 +80,7 @@ fn get_new_state(map: &Vec<Vec<SeatStatus>>, y: usize, x: usize) -> SeatStatus {
     }
 }
 
-fn get_new_state2(map: &Vec<Vec<SeatStatus>>, y: usize, x: usize) -> SeatStatus {
+fn get_new_state2(map: &SeatMap, y: usize, x: usize) -> SeatStatus {
     let count = count_occupied(map, y, x);
 
     match (map[y][x], count) {
