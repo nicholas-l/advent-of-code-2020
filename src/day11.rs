@@ -44,7 +44,6 @@ impl Debug for SeatStatus {
     }
 }
 
-
 fn get_new_state(
     map: &SeatMap,
     y: usize,
@@ -95,11 +94,12 @@ fn count_occupied(map: &SeatMap, y: usize, x: usize, max_depth: usize) -> usize 
             let mut cy = y as isize + dy;
             let mut cx = x as isize + dx;
             while cy >= 0 && cy < rows && cx >= 0 && cx < cols && depth < max_depth {
-                if map[cy as usize][cx as usize] == SeatStatus::Occupied {
-                    return true;
-                } else if map[cy as usize][cx as usize] == SeatStatus::Empty {
-                    return false;
+                match map[cy as usize][cx as usize] {
+                    SeatStatus::Occupied => return true,
+                    SeatStatus::Empty => return false,
+                    _ => (),
                 }
+
                 depth += 1;
                 cy += dy;
                 cx += dx;
