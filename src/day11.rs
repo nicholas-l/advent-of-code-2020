@@ -44,53 +44,27 @@ impl Debug for SeatStatus {
     }
 }
 
-fn get_new_state(map: &SeatMap, y: usize, x: usize) -> SeatStatus {
-    let mut count = 0;
-    let dirs: [(isize, isize); 8] = [
-        (-1, -1),
-        (-1, 0),
-        (-1, 1),
-        (0, -1),
-        (0, 1),
-        (1, -1),
-        (1, 0),
-        (1, 1),
-    ];
-    for (dy, dx) in dirs.iter() {
-        // FIXME: has overflow
-        let cy = (y as isize + dy) as usize;
-        let cx = ((x as isize) + dx) as usize;
-        if map
-            .get(cy)
-            .and_then(|row| row.get(cx))
-            .map(|x| match x {
-                SeatStatus::Occupied => true,
-                _ => false,
-            })
-            .unwrap_or(false)
-        {
-            count += 1;
-        }
-    }
+
+fn get_new_state(
+    map: &SeatMap,
+    y: usize,
+    x: usize,
+    max_depth: usize,
+    empty_threshold: usize,
+) -> SeatStatus {
+    let count = count_occupied(map, y, x, max_depth);
 
     match (map[y][x], count) {
         (SeatStatus::Empty, 0) => SeatStatus::Occupied,
-        (SeatStatus::Occupied, 4..=12) => SeatStatus::Empty,
+        (SeatStatus::Occupied, x) if x >= empty_threshold => SeatStatus::Empty,
         _ => map[y][x],
     }
 }
 
-fn get_new_state2(map: &SeatMap, y: usize, x: usize) -> SeatStatus {
-    let count = count_occupied(map, y, x);
-
-    match (map[y][x], count) {
-        (SeatStatus::Empty, 0) => SeatStatus::Occupied,
-        (SeatStatus::Occupied, 5..=12) => SeatStatus::Empty,
-        _ => map[y][x],
-    }
-}
-
-fn step<T>(map: &SeatMap, get_new_state: T) -> SeatMap  where T: Fn(&SeatMap, usize, usize) -> SeatStatus {
+fn step<T>(map: &SeatMap, get_new_state: T) -> SeatMap
+where
+    T: Fn(&SeatMap, usize, usize) -> SeatStatus,
+{
     map.iter()
         .enumerate()
         .map(|(y, row)| {
@@ -102,7 +76,7 @@ fn step<T>(map: &SeatMap, get_new_state: T) -> SeatMap  where T: Fn(&SeatMap, us
         .collect()
 }
 
-fn count_occupied(map: &SeatMap, y: usize, x: usize) -> usize {
+fn count_occupied(map: &SeatMap, y: usize, x: usize, max_depth: usize) -> usize {
     let dirs: [(isize, isize); 8] = [
         (-1, -1),
         (-1, 0),
@@ -117,20 +91,30 @@ fn count_occupied(map: &SeatMap, y: usize, x: usize) -> usize {
     let cols = map[y].len() as isize;
     dirs.iter()
         .filter(|(dy, dx)| {
+            let mut depth = 0;
             let mut cy = y as isize + dy;
             let mut cx = x as isize + dx;
-            while cy >= 0 && cy < rows && cx >= 0 && cx < cols {
+            while cy >= 0 && cy < rows && cx >= 0 && cx < cols && depth < max_depth {
                 if map[cy as usize][cx as usize] == SeatStatus::Occupied {
                     return true;
                 } else if map[cy as usize][cx as usize] == SeatStatus::Empty {
                     return false;
                 }
+                depth += 1;
                 cy += dy;
                 cx += dx;
             }
             false
         })
         .count()
+}
+
+fn get_new_state_one(map: &SeatMap, y: usize, x: usize) -> SeatStatus {
+    get_new_state(map, y, x, 1, 4)
+}
+
+fn get_new_state_two(map: &SeatMap, y: usize, x: usize) -> SeatStatus {
+    get_new_state(map, y, x, map.len().max(map[0].len()) + 1, 5)
 }
 
 #[allow(dead_code, unused_variables)]
@@ -145,8 +129,9 @@ pub fn star_one(input: impl BufRead) -> usize {
                 .collect()
         })
         .collect();
+
     loop {
-        let map2 = step(&map, get_new_state);
+        let map2 = step(&map, get_new_state_one);
         if map == map2 {
             break map
                 .iter()
@@ -169,8 +154,9 @@ pub fn star_two(input: impl BufRead) -> usize {
                 .collect()
         })
         .collect();
+
     loop {
-        let map2 = step(&map, get_new_state2);
+        let map2 = step(&map, get_new_state_two);
         if map == map2 {
             break map
                 .iter()
@@ -184,7 +170,7 @@ pub fn star_two(input: impl BufRead) -> usize {
 #[cfg(test)]
 mod tests {
     use super::{
-        count_occupied, get_new_state, get_new_state2, star_one, star_two, step, SeatMap,
+        count_occupied, get_new_state_one, get_new_state_two, star_one, star_two, step, SeatMap,
         SeatStatus, TryFrom,
     };
     use std::io::Cursor;
@@ -216,7 +202,7 @@ mod tests {
 #.#####.##",
         );
 
-        assert_eq!(get_new_state(&expected_map, 0, 2), SeatStatus::Empty);
+        assert_eq!(get_new_state_one(&expected_map, 0, 2), SeatStatus::Empty);
     }
 
     #[test]
@@ -247,8 +233,8 @@ L.LLLLL.LL",
 #.#####.##",
         );
 
-        assert_eq!(get_new_state(&expected_map, 0, 2), SeatStatus::Empty);
-        assert_eq!(step(&map, get_new_state), expected_map);
+        assert_eq!(get_new_state_one(&expected_map, 0, 2), SeatStatus::Empty);
+        assert_eq!(step(&map, get_new_state_one), expected_map);
 
         let expected_map2 = get_map(
             "#.LL.L#.##
@@ -262,7 +248,8 @@ L.L.L..L..
 #.LLLLLL.L
 #.#LLLL.##",
         );
-        assert_eq!(step(&expected_map, get_new_state), expected_map2);
+
+        assert_eq!(step(&expected_map, get_new_state_one), expected_map2);
     }
 
     #[test]
@@ -293,7 +280,10 @@ L.LLLLL.LL";
 #........
 ...#.....",
         );
-        assert_eq!(count_occupied(&map, 4, 3), 8)
+        assert_eq!(
+            count_occupied(&map, 4, 3, map.len().max(map[0].len()) + 1),
+            8
+        )
     }
 
     #[test]
@@ -334,9 +324,11 @@ LLLLLLLLL#
 #.LLLLLL.L
 #.LLLLL.L#",
         );
-
-        assert_eq!(step(&map, get_new_state2), map2);
-        assert_eq!(step(&step(&map, get_new_state2), get_new_state2), map3);
+        assert_eq!(step(&map, get_new_state_two), map2);
+        assert_eq!(
+            step(&step(&map, get_new_state_two), get_new_state_two),
+            map3
+        );
     }
 
     #[test]
@@ -353,8 +345,7 @@ LLLLLLLLL#
 #.######.#
 #.#####.##",
         );
-
-        assert_eq!(get_new_state2(&map, 1, 9), SeatStatus::Empty);
+        assert_eq!(get_new_state_two(&map, 1, 9), SeatStatus::Empty);
     }
 
     #[test]
