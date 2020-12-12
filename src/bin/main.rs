@@ -60,6 +60,10 @@ fn main() {
                 use day11::{star_one, star_two};
                 (star_one as DayFn, star_two as DayFn, "day11.txt")
             }
+            "12" => {
+                use day11::{star_one, star_two};
+                (star_one as DayFn, star_two as DayFn, "day12.txt")
+            }
             x => {
                 unimplemented!("Have not implemented day {}", x);
             }
