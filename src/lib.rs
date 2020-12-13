@@ -15,6 +15,7 @@ pub mod day09;
 pub mod day10;
 pub mod day11;
 pub mod day12;
+pub mod day13;
 
 #[cfg(test)]
 mod tests {
@@ -171,5 +172,17 @@ mod tests {
         let f = fs::File::open("day12.txt").unwrap();
         let input = BufReader::new(f);
         assert_eq!(star_two(input), 106860);
+    }
+    #[test]
+    fn day13_complete() {
+        use crate::day13::{star_one, star_two};
+
+        let f = fs::File::open("day13.txt").unwrap();
+        let input = BufReader::new(f);
+        assert_eq!(star_one(input), 4315);
+
+        let f = fs::File::open("day13.txt").unwrap();
+        let input = BufReader::new(f);
+        assert_eq!(star_two(input), 556100168221141);
     }
 }
