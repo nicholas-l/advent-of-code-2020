@@ -1,4 +1,8 @@
 #![feature(map_first_last)]
+use std::{
+    io::BufRead,
+    path::{Path, PathBuf},
+};
 
 #[macro_use]
 extern crate lazy_static;
@@ -17,172 +21,231 @@ pub mod day11;
 pub mod day12;
 pub mod day13;
 
+type DayFn = fn(Box<dyn BufRead>) -> usize;
+
+pub fn get_day(day: usize) -> (DayFn, DayFn, PathBuf) {
+    match day {
+        1 => {
+            use day01::{star_one, star_two};
+            (
+                star_one as DayFn,
+                star_two as DayFn,
+                Path::new("data").join("day01.txt"),
+            )
+        }
+        2 => {
+            use day02::{star_one, star_two};
+            (
+                star_one as DayFn,
+                star_two as DayFn,
+                Path::new("data").join("day02.txt"),
+            )
+        }
+        3 => {
+            use day03::{star_one, star_two};
+            (
+                star_one as DayFn,
+                star_two as DayFn,
+                Path::new("data").join("day03.txt"),
+            )
+        }
+        4 => {
+            use day04::{star_one, star_two};
+            (
+                star_one as DayFn,
+                star_two as DayFn,
+                Path::new("data").join("day04.txt"),
+            )
+        }
+        5 => {
+            use day05::{star_one, star_two};
+            (
+                star_one as DayFn,
+                star_two as DayFn,
+                Path::new("data").join("day05.txt"),
+            )
+        }
+        6 => {
+            use day06::{star_one, star_two};
+            (
+                star_one as DayFn,
+                star_two as DayFn,
+                Path::new("data").join("day06.txt"),
+            )
+        }
+        7 => {
+            use day07::{star_one, star_two};
+            (
+                star_one as DayFn,
+                star_two as DayFn,
+                Path::new("data").join("day07.txt"),
+            )
+        }
+        8 => {
+            use day08::{star_one, star_two};
+            (
+                star_one as DayFn,
+                star_two as DayFn,
+                Path::new("data").join("day08.txt"),
+            )
+        }
+        9 => {
+            use day09::{star_one, star_two};
+            (
+                star_one as DayFn,
+                star_two as DayFn,
+                Path::new("data").join("day09.txt"),
+            )
+        }
+        10 => {
+            use day10::{star_one, star_two};
+            (
+                star_one as DayFn,
+                star_two as DayFn,
+                Path::new("data").join("day10.txt"),
+            )
+        }
+        11 => {
+            use day11::{star_one, star_two};
+            (
+                star_one as DayFn,
+                star_two as DayFn,
+                Path::new("data").join("day11.txt"),
+            )
+        }
+        12 => {
+            use day12::{star_one, star_two};
+            (
+                star_one as DayFn,
+                star_two as DayFn,
+                Path::new("data").join("day12.txt"),
+            )
+        }
+        13 => {
+            use day13::{star_one, star_two};
+            (
+                star_one as DayFn,
+                star_two as DayFn,
+                Path::new("data").join("day13.txt"),
+            )
+        }
+        x => {
+            unimplemented!("Have not implemented day {}", x);
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
+    use super::*;
     use std::fs;
     use std::io::BufReader;
+
+    fn get_data(filepath: &PathBuf) -> Box<dyn BufRead> {
+        let f = fs::File::open(filepath).unwrap();
+        let input = BufReader::new(f);
+        Box::new(input)
+    }
+
     #[test]
     fn day01_complete() {
-        use crate::day01::{star_one, star_two};
+        let (star_one, star_two, filepath) = get_day(1);
+        assert_eq!(star_one(get_data(&filepath)), 805731);
 
-        let f = fs::File::open("day01.txt").unwrap();
-        let input = BufReader::new(f);
-        assert_eq!(star_one(input), 805731);
-        let f = fs::File::open("day01.txt").unwrap();
-        let input = BufReader::new(f);
-        assert_eq!(star_two(input), 192684960);
+        assert_eq!(star_two(get_data(&filepath)), 192684960);
     }
 
     #[test]
     fn day02_complete() {
-        use crate::day02::{star_one, star_two};
+        let (star_one, star_two, filename) = get_day(2);
 
-        let f = fs::File::open("day02.txt").unwrap();
-        let input = BufReader::new(f);
-        assert_eq!(star_one(input), 469);
-        let f = fs::File::open("day02.txt").unwrap();
-        let input = BufReader::new(f);
-        assert_eq!(star_two(input), 267);
+        assert_eq!(star_one(get_data(&filename)), 469);
+        assert_eq!(star_two(get_data(&filename)), 267);
     }
 
     #[test]
     fn day03_complete() {
-        use crate::day03::{star_one, star_two};
+        let (star_one, star_two, filename) = get_day(3);
 
-        let f = fs::File::open("day03.txt").unwrap();
-        let input = BufReader::new(f);
-        assert_eq!(star_one(input), 145);
-
-        let f = fs::File::open("day03.txt").unwrap();
-        let input = BufReader::new(f);
-        assert_eq!(star_two(input), 3424528800);
+        assert_eq!(star_one(get_data(&filename)), 145);
+        assert_eq!(star_two(get_data(&filename)), 3424528800);
     }
 
     #[test]
     fn day04_complete() {
-        use crate::day04::{star_one, star_two};
+        let (star_one, star_two, filename) = get_day(4);
 
-        let f = fs::File::open("day04.txt").unwrap();
-        let input = BufReader::new(f);
-        assert_eq!(star_one(input), 230);
-
-        let f = fs::File::open("day04.txt").unwrap();
-        let input = BufReader::new(f);
-        assert_eq!(star_two(input), 156);
+        assert_eq!(star_one(get_data(&filename)), 230);
+        assert_eq!(star_two(get_data(&filename)), 156);
     }
 
     #[test]
     fn day05_complete() {
-        use crate::day05::{star_one, star_two};
+        let (star_one, star_two, filename) = get_day(5);
 
-        let f = fs::File::open("day05.txt").unwrap();
-        let input = BufReader::new(f);
-        assert_eq!(star_one(input), 994);
-
-        let f = fs::File::open("day05.txt").unwrap();
-        let input = BufReader::new(f);
-        assert_eq!(star_two(input), 741);
+        assert_eq!(star_one(get_data(&filename)), 994);
+        assert_eq!(star_two(get_data(&filename)), 741);
     }
 
     #[test]
     fn day06_complete() {
-        use crate::day06::{star_one, star_two};
+        let (star_one, star_two, filename) = get_day(6);
 
-        let f = fs::File::open("day06.txt").unwrap();
-        let input = BufReader::new(f);
-        assert_eq!(star_one(input), 6382);
-
-        let f = fs::File::open("day06.txt").unwrap();
-        let input = BufReader::new(f);
-        assert_eq!(star_two(input), 3197);
+        assert_eq!(star_one(get_data(&filename)), 6382);
+        assert_eq!(star_two(get_data(&filename)), 3197);
     }
 
     #[test]
     fn day07_complete() {
-        use crate::day07::{star_one, star_two};
+        let (star_one, star_two, filename) = get_day(7);
 
-        let f = fs::File::open("day07.txt").unwrap();
-        let input = BufReader::new(f);
-        assert_eq!(star_one(input), 172);
-
-        let f = fs::File::open("day07.txt").unwrap();
-        let input = BufReader::new(f);
-        assert_eq!(star_two(input), 39645);
+        assert_eq!(star_one(get_data(&filename)), 172);
+        assert_eq!(star_two(get_data(&filename)), 39645);
     }
 
     #[test]
     fn day08_complete() {
-        use crate::day08::{star_one, star_two};
+        let (star_one, star_two, filename) = get_day(8);
 
-        let f = fs::File::open("day08.txt").unwrap();
-        let input = BufReader::new(f);
-        assert_eq!(star_one(input), 1816);
-
-        let f = fs::File::open("day08.txt").unwrap();
-        let input = BufReader::new(f);
-        assert_eq!(star_two(input), 1149);
+        assert_eq!(star_one(get_data(&filename)), 1816);
+        assert_eq!(star_two(get_data(&filename)), 1149);
     }
 
     #[test]
     fn day09_complete() {
-        use crate::day09::{star_one, star_two};
+        let (star_one, star_two, filename) = get_day(9);
 
-        let f = fs::File::open("day09.txt").unwrap();
-        let input = BufReader::new(f);
-        assert_eq!(star_one(input), 18272118);
-
-        let f = fs::File::open("day09.txt").unwrap();
-        let input = BufReader::new(f);
-        assert_eq!(star_two(input), 2186361);
+        assert_eq!(star_one(get_data(&filename)), 18272118);
+        assert_eq!(star_two(get_data(&filename)), 2186361);
     }
 
     #[test]
     fn day10_complete() {
-        use crate::day10::{star_one, star_two};
+        let (star_one, star_two, filename) = get_day(10);
 
-        let f = fs::File::open("day10.txt").unwrap();
-        let input = BufReader::new(f);
-        assert_eq!(star_one(input), 2201);
-
-        let f = fs::File::open("day10.txt").unwrap();
-        let input = BufReader::new(f);
-        assert_eq!(star_two(input), 169255295254528);
+        assert_eq!(star_one(get_data(&filename)), 2201);
+        assert_eq!(star_two(get_data(&filename)), 169255295254528);
     }
 
     #[test]
     fn day11_complete() {
-        use crate::day11::{star_one, star_two};
+        let (star_one, star_two, filename) = get_day(11);
 
-        let f = fs::File::open("day11.txt").unwrap();
-        let input = BufReader::new(f);
-        assert_eq!(star_one(input), 2412);
-
-        let f = fs::File::open("day11.txt").unwrap();
-        let input = BufReader::new(f);
-        assert_eq!(star_two(input), 2176);
+        assert_eq!(star_one(get_data(&filename)), 2412);
+        assert_eq!(star_two(get_data(&filename)), 2176);
     }
     #[test]
     fn day12_complete() {
-        use crate::day12::{star_one, star_two};
+        let (star_one, star_two, filename) = get_day(12);
 
-        let f = fs::File::open("day12.txt").unwrap();
-        let input = BufReader::new(f);
-        assert_eq!(star_one(input), 1457);
-
-        let f = fs::File::open("day12.txt").unwrap();
-        let input = BufReader::new(f);
-        assert_eq!(star_two(input), 106860);
+        assert_eq!(star_one(get_data(&filename)), 1457);
+        assert_eq!(star_two(get_data(&filename)), 106860);
     }
     #[test]
     fn day13_complete() {
-        use crate::day13::{star_one, star_two};
+        let (star_one, star_two, filename) = get_day(13);
 
-        let f = fs::File::open("day13.txt").unwrap();
-        let input = BufReader::new(f);
-        assert_eq!(star_one(input), 4315);
-
-        let f = fs::File::open("day13.txt").unwrap();
-        let input = BufReader::new(f);
-        assert_eq!(star_two(input), 556100168221141);
+        assert_eq!(star_one(get_data(&filename)), 4315);
+        assert_eq!(star_two(get_data(&filename)), 556100168221141);
     }
 }
