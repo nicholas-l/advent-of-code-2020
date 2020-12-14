@@ -97,12 +97,8 @@ fn get_addresses(mask: &Vec<char>, address: usize) -> Vec<usize> {
                 // copy values and update old[i] to 0 and new[i] to 1
                 let new_values = values.clone();
 
-                for opt in &mut values {
-                    opt[i] = '1';
-                }
-
                 values.extend(new_values.into_iter().map(|mut opt|{
-                    opt[i] = '0';
+                    opt[i] = if opt[i] == '0' { '1' } else { '0' };
                     opt
                 }));
                 
