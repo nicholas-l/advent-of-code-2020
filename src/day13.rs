@@ -31,6 +31,7 @@ fn modinv(a: isize, m: isize) -> Option<isize> {
 
 #[allow(dead_code, unused_variables)]
 pub fn star_two(input: impl BufRead) -> usize {
+    
     let ids: Vec<(isize, isize)> = input
         .lines()
         .skip(1)
@@ -46,6 +47,12 @@ pub fn star_two(input: impl BufRead) -> usize {
     let sum = ids
         .iter()
         .map(|x| {
+            /*
+            Why we do bus_id (.1) - position (.0) => (a, n)
+            0, 7  => (x + 0) ≡ 0 (mod 7)  => x ≡  0 (mod 7)  (2.) => x ≡  7 - 0 (mod 7)  =>  7 - 0, 7
+            1, 13 => (x + 1) ≡ 0 (mod 13) => x ≡ -1 (mod 13) (2.) => x ≡ 13 - 1 (mod 13) => 13 - 1, 13
+            4, 59 => (x + 4) ≡ 0 (mod 59) => x ≡ -4 (mod 59) (2.) => x ≡ 59 - 4 (mod 59) => 59 - 4, 59
+            */
             let n = x.1;
             let a = x.1 - x.0;
             let n_product_n = n_product / n;
