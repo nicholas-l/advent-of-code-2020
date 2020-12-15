@@ -1,6 +1,6 @@
+use std::collections::hash_map::Entry;
 use std::collections::HashMap;
 use std::io::BufRead;
-use std::collections::hash_map::Entry;
 
 fn run(input: impl BufRead, index: usize) -> usize {
     let starting: Vec<usize> = input
@@ -8,40 +8,41 @@ fn run(input: impl BufRead, index: usize) -> usize {
         .filter_map(Result::ok)
         .map(|x| String::from_utf8(x).unwrap().parse::<usize>().unwrap())
         .collect();
-    let mut map: HashMap<usize, Vec<usize>> = HashMap::new();
+    let mut map: HashMap<usize, (usize, Option<usize>)> = HashMap::new();
+    // let mut first: HashMap<usize, Vec<usize>> = HashMap::new();
     let mut last_spoken = starting[2];
     for (i, x) in starting.iter().enumerate() {
-        map.insert(*x, vec![i]);
+        map.insert(*x, (i, None));
     }
 
-    let mut first_time_spoken = true;
-    for i in starting.len()..index {
+    let start = starting.len();
+
+    for i in start..index {
         // If we have just spoken it the first time in the previous turn
-        let value = if first_time_spoken {
-            0
+        let x = map.get(&last_spoken).unwrap();
+        last_spoken = if let Some(later) = x.1 {
+            later - x.0
         } else {
-            let x = map.get(&last_spoken).unwrap();
-            x[1] - x[0]
+            0
         };
 
         // Insert this new value into the map;
-        match map.entry(value) {
+        match map.entry(last_spoken) {
             Entry::Occupied(mut e) => {
                 // We have spoken this before.
-                first_time_spoken = false;
                 let v = e.get_mut();
-                v.push(i);
-                if v.len() > 2 {
-                    v.remove(0);
+                if let Some(later) = v.1 {
+                    v.0 = later;
+                    v.1.replace(i);
+                } else {
+                    v.1 = Some(i);
                 }
             }
             Entry::Vacant(o) => {
                 // First time spoken
-                first_time_spoken = true;
-                o.insert(vec![i]);
+                o.insert((i, None));
             }
         }
-        last_spoken = value;
     }
     last_spoken
 }
