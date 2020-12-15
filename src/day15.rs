@@ -10,41 +10,47 @@ fn run(input: impl BufRead, index: usize) -> usize {
         .collect();
     let mut map: HashMap<usize, (usize, Option<usize>)> = HashMap::new();
     // let mut first: HashMap<usize, Vec<usize>> = HashMap::new();
-    let mut last_spoken = starting[2];
+    // let mut last_spoken = starting[2];
     for (i, x) in starting.iter().enumerate() {
         map.insert(*x, (i, None));
     }
 
     let start = starting.len();
 
-    for i in start..index {
-        // If we have just spoken it the first time in the previous turn
-        let x = map.get(&last_spoken).unwrap();
-        last_spoken = if let Some(later) = x.1 {
-            later - x.0
-        } else {
-            0
-        };
+    (start..)
+        .scan((starting[2], map), |(last_spoken, map), i| {
+            // If we have just spoken it the first time in the previous turn
+            let x = map.get(&last_spoken).unwrap();
+            let value = if let Some(later) = x.1 {
+                later - x.0
+            } else {
+                0
+            };
 
-        // Insert this new value into the map;
-        match map.entry(last_spoken) {
-            Entry::Occupied(mut e) => {
-                // We have spoken this before.
-                let v = e.get_mut();
-                if let Some(later) = v.1 {
-                    v.0 = later;
-                    v.1.replace(i);
-                } else {
-                    v.1 = Some(i);
+            // Insert this new value into the map;
+            match map.entry(value) {
+                Entry::Occupied(mut e) => {
+                    // We have spoken this before.
+                    let v = e.get_mut();
+                    if let Some(later) = v.1 {
+                        v.0 = later;
+                        v.1.replace(i);
+                    } else {
+                        v.1 = Some(i);
+                    }
                 }
-            }
-            Entry::Vacant(o) => {
-                // First time spoken
-                o.insert((i, None));
-            }
-        }
-    }
-    last_spoken
+                Entry::Vacant(o) => {
+                    // First time spoken
+                    o.insert((i, None));
+                }
+            };
+            *last_spoken = value;
+            // println!("{}", value);
+            Some(value)
+        })
+        .skip(index - start - 1)
+        .next()
+        .unwrap()
 }
 
 #[allow(dead_code, unused_variables)]
