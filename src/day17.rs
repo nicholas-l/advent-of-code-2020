@@ -1,4 +1,4 @@
-use std::fmt::Debug;
+use std::{collections::HashMap, fmt::Debug};
 use std::{convert::TryFrom, io::BufRead};
 
 #[derive(Copy, Clone, PartialEq)]
@@ -27,6 +27,52 @@ impl Debug for Cube {
         f.write_fmt(format_args!("{}", c))
     }
 }
+
+// https://stackoverflow.com/questions/18732974/c-dynamic-number-of-nested-for-loops-without-recursion
+fn iterative_nested_loop(depth: usize, max: Vec<usize>, mut action: impl FnMut(&Vec<usize>)) {
+    // Initialize the slots to hold the current iteration value for each depth
+    let mut slots = vec![0; depth];
+
+    let mut index = 0;
+    loop {
+        action(&slots);
+        println!("{:?}", slots);
+        // Increment
+        slots[0] += 1;
+
+        // Carry
+        while slots[index] == max[index] {
+            // Overflow, we're done
+            if index == depth - 1 {
+                return;
+            }
+
+            slots[index] = 0;
+            index += 1;
+            slots[index] += 1;
+        }
+
+        index = 0;
+    }
+}
+
+// #[derive(Clone)]
+// struct Map {
+//     data: HashMap<Vec<usize>, Cube>,
+//     dimensions: Vec<usize>,
+// }
+
+// impl Map {
+//     fn pad(&mut self, amount: usize) {
+//         let data = HashMap::new();
+//         for (pos, cube) in data {
+//             let new_pos = pos.into_iter().map(|i| i + 1).collect();
+//             data.insert(new_pos, cube);
+//         }
+//         self.dimensions = self.dimensions.into_iter().map(|i| i + 2).collect();
+//         self.data = data;
+//     }
+// }
 
 type State = Vec<Vec<Vec<Cube>>>;
 
@@ -61,10 +107,11 @@ fn count_active(state: &State, i: usize, j: usize, k: usize) -> usize {
     count
 }
 
-fn step(state: Vec<Vec<Vec<Cube>>>) -> Vec<Vec<Vec<Cube>>> {
+fn step(state: State) -> State {
     let depth = state.len() + 2;
     let number_of_rows = state[0].len() + 2;
     let number_of_columns = state[0][0].len() + 2;
+    // let mut new_state = state.pad(1);
     let mut new_state = vec![vec![vec![Cube::Inactive; number_of_columns]; number_of_rows]; depth];
     let mut old_state = vec![vec![vec![Cube::Inactive; number_of_columns]; number_of_rows]; depth];
     for i in 0..(depth - 2) {
@@ -74,18 +121,18 @@ fn step(state: Vec<Vec<Vec<Cube>>>) -> Vec<Vec<Vec<Cube>>> {
             }
         }
     }
-    for i in 0..depth {
-        for j in 0..number_of_rows {
-            for k in 0..number_of_columns {
-                let current = old_state[i][j][k];
-                new_state[i][j][k] = match (current, count_active(&old_state, i, j, k)) {
-                    (Cube::Active, 2..=3) => Cube::Active,
-                    (Cube::Inactive, 3) => Cube::Active,
-                    _ => Cube::Inactive,
-                }
-            }
+    let maxes = vec![depth, number_of_rows, number_of_columns];
+    iterative_nested_loop(maxes.len(), maxes, |v| {
+        let i = v[0];
+        let j = v[1];
+        let k = v[2];
+        let current = old_state[i][j][k];
+        new_state[i][j][k] = match (current, count_active(&old_state, i, j, k)) {
+            (Cube::Active, 2..=3) => Cube::Active,
+            (Cube::Inactive, 3) => Cube::Active,
+            _ => Cube::Inactive,
         }
-    }
+    });
     new_state
 }
 
@@ -241,6 +288,11 @@ pub fn star_two(input: impl BufRead) -> usize {
 mod tests {
     use super::*;
     use std::io::Cursor;
+
+    #[test]
+    fn test_loop() {
+        iterative_nested_loop(2, vec![3, 5], |v| println!("{:?}", v));
+    }
 
     #[test]
     fn test_count_active() {
