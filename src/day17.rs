@@ -180,32 +180,6 @@ fn parse_state(input: impl BufRead) -> State {
     state
 }
 
-fn print_state(state: &State) {
-    for z in state {
-        for row in z {
-            for x in row {
-                print!("{:?}", x);
-            }
-            println!("");
-        }
-        println!("");
-    }
-}
-
-fn print_state2(state: &Vec<Vec<Vec<Vec<Cube>>>>) {
-    for w in state {
-        for z in w {
-            for row in z {
-                for x in row {
-                    print!("{:?}", x);
-                }
-                println!("");
-            }
-            println!("");
-        }
-    }
-}
-
 #[allow(dead_code, unused_variables)]
 pub fn star_one(input: impl BufRead) -> usize {
     let mut state = parse_state(input);
@@ -242,6 +216,32 @@ mod tests {
     use super::*;
     use std::io::Cursor;
 
+    fn print_state(state: &State) {
+        for z in state {
+            for row in z {
+                for x in row {
+                    print!("{:?}", x);
+                }
+                println!("");
+            }
+            println!("");
+        }
+    }
+
+    fn print_state2(state: &Vec<Vec<Vec<Vec<Cube>>>>) {
+        for w in state {
+            for z in w {
+                for row in z {
+                    for x in row {
+                        print!("{:?}", x);
+                    }
+                    println!("");
+                }
+                println!("");
+            }
+        }
+    }
+
     #[test]
     fn test_count_active() {
         let input = b".#.
@@ -273,26 +273,9 @@ mod tests {
 ###";
 
         let state = parse_state(Cursor::new(input));
-        // dbg!(&state);
-        let z1 = b"#..
-..#
-.#.";
-
-        let z2 = "#.#
-.##
-.#.";
-        let z3 = "#..
-..#
-.#.";
-        let expected = vec![
-            parse_state(Cursor::new(z1)).pop().unwrap(),
-            parse_state(Cursor::new(z2)).pop().unwrap(),
-            parse_state(Cursor::new(z3)).pop().unwrap(),
-        ];
         let new_state = step(state);
 
         print_state(&new_state);
-        // assert_eq!(new_state, expected);
     }
 
     #[test]
@@ -310,26 +293,10 @@ mod tests {
 ###";
 
         let state = vec![parse_state(Cursor::new(input))];
-        // dbg!(&state);
-        let z1 = b"#..
-..#
-.#.";
 
-        let z2 = "#.#
-.##
-.#.";
-        let z3 = "#..
-..#
-.#.";
-        let expected = vec![
-            parse_state(Cursor::new(z1)).pop().unwrap(),
-            parse_state(Cursor::new(z2)).pop().unwrap(),
-            parse_state(Cursor::new(z3)).pop().unwrap(),
-        ];
         let new_state = step2(state);
 
         print_state2(&new_state);
-        // assert_eq!(new_state, expected);
     }
 
     #[test]
