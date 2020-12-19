@@ -36,61 +36,39 @@ fn parse_rule(input: &[&str]) -> Rule {
         Rule::Multiple(input.iter().map(|r| parse_single(r)).collect())
     }
 }
-
-// fn compile_rule_to_nom(map: &HashMap<usize, Rule>,
-//     rule: &Rule) -> impl Parser< {
-//         match rule {
-//             Rule::Multiple(v) => {
-//                 let mut f = compile_rule_to_nom(map, &v[0]);
-//                 for rule in &v[1..] {
-//                     f = f.and(compile_rule_to_nom(map, rule));
-//                 }
-//                 f
-//             }
-//             Rule::Value(c) => {
-//                 if input.len() > 0 && input[0] == *c {
-//                     Some(&input[1..])
-//                 } else {
-//                     None
-//                 }
-//             }
-//             Rule::Ref(i) => {
-//                 let new_rule = map.get(&i).expect("Could not find rule in match rule");
-//                 match_rule(map, new_rule, &input[..])
-//             }
-//             Rule::Alt(v) => {
-//                 // greedy?
-    
-//                 v.iter()
-//                     .filter_map(|rule| match_rule(map, rule, &input[..]))
-//                     .min_by_key(|r| r.len())
-    
-//                 // None
-//             }
-//         }
-// }
-
+/// This function returns None if the rule cannot match the input or Some if it can.
+/// The vector is the possible leftover input, which is important 
+/// for backtracking when a branch does not complete.
+/// None => Failed to parse the input.
+/// Some(vec![]) => Completed successfully with no more input rest to parse.
+/// Some(vec![['a'], ['a', 'b']]) => two different possibilities that are left to parsed
+///     that have been successfully parsed.
+/// To verify that a rule matches an input use `res.map(|r| r.iter().any(|r| r.len() == 0)).unwrap_or(false)`
 fn match_rule<'a>(
     map: &HashMap<usize, Rule>,
     rule: &Rule,
     input: &'a [char],
-) -> Option<&'a [char]> {
+) -> Option<Vec<&'a [char]>> {
     // println!("{:?}: {:?}", rule, input);
     match rule {
         Rule::Multiple(v) => {
-            let mut remainder = &input[..];
+            let remainder = &input[..];
+            let mut new_remainders = vec![remainder];
             for rule in v {
-                if let Some(left) = match_rule(map, rule, remainder) {
-                    remainder = &left[..];
-                } else {
+                new_remainders = new_remainders
+                    .into_iter()
+                    .filter_map(|remainder| match_rule(map, rule, remainder))
+                    .flatten()
+                    .collect();
+                if new_remainders.len() == 0 {
                     return None;
                 }
             }
-            Some(&remainder[..])
+            Some(new_remainders)
         }
         Rule::Value(c) => {
             if input.len() > 0 && input[0] == *c {
-                Some(&input[1..])
+                Some(vec![&input[1..]])
             } else {
                 None
             }
@@ -100,31 +78,19 @@ fn match_rule<'a>(
             match_rule(map, new_rule, &input[..])
         }
         Rule::Alt(v) => {
-            // greedy?
-
-            v.iter()
-                .filter_map(|rule| match_rule(map, rule, &input[..]))
-                .min_by_key(|r| r.len())
-
-            // None
+            let res: Vec<&[char]> = v.iter()
+                    .filter_map(|rule| match_rule(map, rule, &input[..]))
+                    .flatten()
+                    .collect();
+            if res.len() == 0 {
+                None
+            } else {
+                Some(res)
+            }
         }
     }
 }
 
-#[allow(dead_code, unused_variables)]
-pub fn star_one(input: impl BufRead) -> usize {
-    let (values, rules) = parse_input(input, None);
-    let rule0 = rules.get(&0).expect("Rule 0 not found");
-    values
-        .lines()
-        .filter(|line| {
-            let chars: Vec<char> = line.chars().collect();
-            let res = match_rule(&rules, rule0, &chars[..]);
-            res.map(|r| r.len() == 0).unwrap_or(false)
-        })
-        .inspect(|line| println!("{:?}", line))
-        .count()
-}
 
 fn parse_rule_line(line: &str) -> (usize, Rule) {
     let index = line.split(':').next().unwrap().parse::<usize>().unwrap();
@@ -162,6 +128,21 @@ fn parse_input(mut input: impl BufRead, overrides: Option<&str>) -> (String, Has
     (values.to_string(), rules)
 }
 
+
+#[allow(dead_code, unused_variables)]
+pub fn star_one(input: impl BufRead) -> usize {
+    let (values, rules) = parse_input(input, None);
+    let rule0 = rules.get(&0).expect("Rule 0 not found");
+    values
+        .lines()
+        .filter(|line| {
+            let chars: Vec<char> = line.chars().collect();
+            let res = match_rule(&rules, rule0, &chars[..]);
+            res.map(|r| r.iter().any(|r| r.len() == 0)).unwrap_or(false)
+        })
+        .count()
+}
+
 #[allow(dead_code, unused_variables)]
 pub fn star_two(input: impl BufRead) -> usize {
     let overrides = "8: 42 | 42 8
@@ -175,9 +156,9 @@ pub fn star_two(input: impl BufRead) -> usize {
         .filter(|line| {
             let chars: Vec<char> = line.trim().chars().collect();
             let res = match_rule(&rules, rule0, &chars[..]);
-            res.map(|r| r.len() == 0).unwrap_or(false)
+            // Check if any of the inputs left to parse is empty.
+            res.map(|r| r.iter().any(|r| r.len() == 0)).unwrap_or(false)
         })
-        .inspect(|line| println!("{}", line))
         .count()
 }
 
@@ -252,41 +233,28 @@ aaaabbb";
     }
 
     #[test]
+    fn test_match_rule_alt() {
+        let input = b"0: 1 | 2
+1: \"a\"
+2: \"b\"
+
+test";
+        let (_, rules) = parse_input(Cursor::new(input), None);
+        let test: Vec<char> = "a".chars().collect();
+        assert_eq!(
+            match_rule(&rules, rules.get(&0).unwrap(), &test[..]),
+            Some(vec![&[] as &[char]])
+        );
+    }
+
+    #[test]
     fn test_match_rule() {
         let overrides = "8: 42 | 42 8
 11: 42 31 | 42 11 31";
         let (_, rules) = parse_input(Cursor::new(INPUT), Some(overrides));
         let test: Vec<char> = "babbbbaabbbbbabbbbbbaabaaabaaa".chars().collect();
-        assert_eq!(
-            match_rule(&rules, rules.get(&0).unwrap(), &test[..]),
-            Some(&[] as &[char])
-        );
-        {
-            let input = b"0: 1 2 | 3 | 4
-1: \"a\"
-2: \"b\"
-3: 1 0 | 0
-4: 0 2 | 4
-
-test";
-            let (_, rules) = parse_input(Cursor::new(input), None);
-            let test: Vec<char> = "ab".chars().collect();
-            assert_eq!(
-                match_rule(&rules, rules.get(&0).unwrap(), &test[..]),
-                Some(&[] as &[char])
-            );
-
-            let test: Vec<char> = "aab".chars().collect();
-            assert_eq!(
-                match_rule(&rules, rules.get(&0).unwrap(), &test[..]),
-                Some(&[] as &[char])
-            );
-            let test: Vec<char> = "aaab".chars().collect();
-            assert_eq!(
-                match_rule(&rules, rules.get(&0).unwrap(), &test[..]),
-                Some(&[] as &[char])
-            );
-        }
+        let output = match_rule(&rules, rules.get(&0).unwrap(), &test[..]);
+        assert_eq!(output.map(|r| r.iter().any(|r| r.len() == 0)), Some(true));
     }
 
     #[test]
