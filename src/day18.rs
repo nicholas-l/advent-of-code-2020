@@ -1,44 +1,44 @@
-use nom::{
-    branch::alt,
-    bytes::complete::{tag, take_while_m_n},
-    character::complete::{alpha1, char, digit1, multispace0, multispace1, one_of},
-    combinator::map_res,
-    sequence::{delimited, preceded, terminated, tuple},
-    IResult,
-};
+// use nom::{
+//     branch::alt,
+//     bytes::complete::{tag, take_while_m_n},
+//     character::complete::{alpha1, char, digit1, multispace0, multispace1, one_of},
+//     combinator::map_res,
+//     sequence::{delimited, preceded, terminated, tuple},
+//     IResult,
+// };
 use std::collections::VecDeque;
 use std::io::BufRead;
 
-enum Expression {
-    Addition(Box<Expression>, Box<Expression>),
-    Multiply(Box<Expression>, Box<Expression>),
-    Value(usize),
-    Brackets(Box<Expression>),
-}
+// enum Expression {
+//     Addition(Box<Expression>, Box<Expression>),
+//     Multiply(Box<Expression>, Box<Expression>),
+//     Value(usize),
+//     Brackets(Box<Expression>),
+// }
 
-impl Expression {
-    fn eval(&self) -> usize {
-        match self {
-            Expression::Addition(a, b) => a.eval() + b.eval(),
-            Expression::Multiply(left, right) => left.eval() + right.eval(),
-            Expression::Value(value) => *value,
-            Expression::Brackets(inner) => inner.eval(),
-        }
-    }
-}
+// impl Expression {
+//     fn eval(&self) -> usize {
+//         match self {
+//             Expression::Addition(a, b) => a.eval() + b.eval(),
+//             Expression::Multiply(left, right) => left.eval() + right.eval(),
+//             Expression::Value(value) => *value,
+//             Expression::Brackets(inner) => inner.eval(),
+//         }
+//     }
+// }
 
-fn parse_number(i: &str) -> IResult<&str, Expression> {
-    map_res(digit1, |digit_str: &str| {
-        digit_str.parse::<usize>().map(Expression::Value)
-    })(i)
-}
+// fn parse_number(i: &str) -> IResult<&str, Expression> {
+//     map_res(digit1, |digit_str: &str| {
+//         digit_str.parse::<usize>().map(Expression::Value)
+//     })(i)
+// }
 
-fn parse(input: &str) -> IResult<&str, Expression> {
-    preceded(
-        multispace0,
-        parse_number, //, parse_application, parse_if, parse_quote)),
-    )(input)
-}
+// fn parse(input: &str) -> IResult<&str, Expression> {
+//     preceded(
+//         multispace0,
+//         parse_number, //, parse_application, parse_if, parse_quote)),
+//     )(input)
+// }
 
 #[derive(Debug, PartialEq)]
 enum Op {
@@ -83,7 +83,6 @@ fn eval_addition_multiply(mut input: VecDeque<Op>) -> VecDeque<Op> {
                 x => panic!(format!("{:?}", x)),
             };
             result.push_back(Op::Value(a * b));
-            
         } else {
             result.push_back(c);
         }
@@ -98,7 +97,10 @@ fn eval_star_two(input: VecDeque<Op>) -> VecDeque<Op> {
     eval_multiply(add_result)
 }
 
-fn eval_parens(mut input: VecDeque<Op>, outer: impl Fn(VecDeque<Op>) -> VecDeque<Op>) -> VecDeque<Op> {
+fn eval_parens(
+    mut input: VecDeque<Op>,
+    outer: impl Fn(VecDeque<Op>) -> VecDeque<Op>,
+) -> VecDeque<Op> {
     let mut result = VecDeque::new();
     while let Some(e) = input.pop_front() {
         if e == Op::LeftParen {

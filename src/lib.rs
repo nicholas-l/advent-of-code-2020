@@ -1,4 +1,4 @@
-#![feature(map_first_last)]
+// #![feature(map_first_last)]
 use std::{
     io::BufRead,
     path::{Path, PathBuf},
@@ -16,7 +16,7 @@ pub mod day06;
 pub mod day07;
 pub mod day08;
 pub mod day09;
-pub mod day10;
+// pub mod day10;
 pub mod day11;
 pub mod day12;
 pub mod day13;
@@ -25,6 +25,7 @@ pub mod day15;
 pub mod day16;
 pub mod day17;
 pub mod day18;
+pub mod day19;
 
 type DayFn = fn(Box<dyn BufRead>) -> usize;
 
@@ -102,14 +103,14 @@ pub fn get_day(day: usize) -> (DayFn, DayFn, PathBuf) {
                 Path::new("data").join("day09.txt"),
             )
         }
-        10 => {
-            use day10::{star_one, star_two};
-            (
-                star_one as DayFn,
-                star_two as DayFn,
-                Path::new("data").join("day10.txt"),
-            )
-        }
+        // 10 => {
+        //     use day10::{star_one, star_two};
+        //     (
+        //         star_one as DayFn,
+        //         star_two as DayFn,
+        //         Path::new("data").join("day10.txt"),
+        //     )
+        // }
         11 => {
             use day11::{star_one, star_two};
             (
@@ -173,6 +174,14 @@ pub fn get_day(day: usize) -> (DayFn, DayFn, PathBuf) {
                 star_one as DayFn,
                 star_two as DayFn,
                 Path::new("data").join("day18.txt"),
+            )
+        }
+        19 => {
+            use day19::{star_one, star_two};
+            (
+                star_one as DayFn,
+                star_two as DayFn,
+                Path::new("data").join("day19.txt"),
             )
         }
         
@@ -332,6 +341,14 @@ mod tests {
         let (star_one, star_two, filename) = get_day(18);
 
         assert_eq!(star_one(get_data(&filename)), 5374004645253);
+        assert_eq!(star_two(get_data(&filename)), 88782789402798);
+    }
+
+    #[test]
+    fn day19_complete() {
+        let (star_one, star_two, filename) = get_day(19);
+
+        assert_eq!(star_one(get_data(&filename)), 115);
         assert_eq!(star_two(get_data(&filename)), 88782789402798);
     }
 }
