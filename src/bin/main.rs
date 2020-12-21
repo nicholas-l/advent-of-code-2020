@@ -8,7 +8,7 @@ use advent_of_code_2020::*;
 fn main() {
     let args: Vec<String> = env::args().skip(1).collect();
     let days = if args.len() == 1 && args[0] == "all" {
-        (1..=19).map(|x| x.to_string()).collect()
+        (1..=20).map(|x| x.to_string()).collect()
     } else {
         args
     };
