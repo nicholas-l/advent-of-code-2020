@@ -1,5 +1,5 @@
 #![feature(map_first_last)]
-#![feature(iterator_fold_self)]
+// #![feature(iterator_fold_self)]
 use std::{
     io::BufRead,
     path::{Path, PathBuf},
@@ -28,6 +28,7 @@ pub mod day17;
 pub mod day18;
 pub mod day19;
 pub mod day20;
+pub mod day21;
 
 type DayFn = fn(Box<dyn BufRead>) -> usize;
 
@@ -192,6 +193,15 @@ pub fn get_day(day: usize) -> (DayFn, DayFn, PathBuf) {
                 star_one as DayFn,
                 star_two as DayFn,
                 Path::new("data").join("day20.txt"),
+            )
+        }
+
+        21 => {
+            use day21::{star_one, star_two};
+            (
+                star_one as DayFn,
+                star_two as DayFn,
+                Path::new("data").join("day21.txt"),
             )
         }
         
@@ -368,5 +378,13 @@ mod tests {
 
         assert_eq!(star_one(get_data(&filename)), 108603771107737);
         // assert_eq!(star_two(get_data(&filename)), 237);
+    }
+
+    #[test]
+    fn day21_complete() {
+        let (star_one, star_two, filename) = get_day(21);
+
+        assert_eq!(star_one(get_data(&filename)), 2412);
+        assert_eq!(star_two(get_data(&filename)), 2412);
     }
 }
