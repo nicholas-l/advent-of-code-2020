@@ -1,6 +1,6 @@
 
 
-use std::collections::{BTreeSet, HashMap};
+use std::collections::{BinaryHeap, HashMap, HashSet};
 use std::io::BufRead;
 
 
@@ -58,25 +58,28 @@ pub fn star_two(input: impl BufRead) -> usize {
     let target = data.iter().max().unwrap() + 3;
 
     // We need to get process the largest values first.
-    let mut stack = BTreeSet::new();
+    let mut stack = BinaryHeap::new();
     let mut cache = HashMap::new();
+    let mut done = HashSet::new();
     // Work backwards from target so we can cache the number of paths that eventually
     // lead to the target.
-    stack.insert(target);
+    stack.push(target);
 
-    while let Some(current) = stack.pop_last() {
-        
-        let number_of_paths = number_to_target(&cache, current, target);
-        cache.insert(current, number_of_paths);
-        if let Ok(number) = data.binary_search(&(current.saturating_sub(1))) {
-            stack.insert(current - 1);
-        }
-        if let Ok(number) = data.binary_search(&(current.saturating_sub(2))) {
-            stack.insert(current - 2);
-        }
+    while let Some(current) = stack.pop() {
+        if !done.contains(&current) {
+            done.insert(current);
+            let number_of_paths = number_to_target(&cache, current, target);
+            cache.insert(current, number_of_paths);
+            if let Ok(number) = data.binary_search(&(current.saturating_sub(1))) {
+                stack.push(current - 1);
+            }
+            if let Ok(number) = data.binary_search(&(current.saturating_sub(2))) {
+                stack.push(current - 2);
+            }
 
-        if let Ok(number) = data.binary_search(&(current.saturating_sub(3))) {
-            stack.insert(current - 3);
+            if let Ok(number) = data.binary_search(&(current.saturating_sub(3))) {
+                stack.push(current - 3);
+            }
         }
     }
 
