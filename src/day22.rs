@@ -60,55 +60,58 @@ pub fn star_one(mut input: impl BufRead) -> usize {
     }
 }
 
-fn get_hash(player1: &VecDeque<usize>, player2: &VecDeque<usize>) -> u64 {
+fn get_hash(players: &Vec<VecDeque<usize>>) -> u64 {
     use std::collections::hash_map::DefaultHasher;
     use std::hash::{Hash, Hasher};
 
     let mut hasher = DefaultHasher::new();
-    player1.hash(&mut hasher);
-    player2.hash(&mut hasher);
+    for player in players {
+        player.hash(&mut hasher);
+    }
     hasher.finish()
 }
 
-fn play_star_two(
-    mut player1: VecDeque<usize>,
-    mut player2: VecDeque<usize>,
-    game: usize,
-) -> (usize, VecDeque<usize>) {
+fn play_star_two(mut players: Vec<VecDeque<usize>>) -> (usize, Vec<VecDeque<usize>>) {
     let mut played = HashSet::new();
     loop {
-        let game_hash = get_hash(&player1, &player2);
+        let game_hash = get_hash(&players);
         if played.contains(&game_hash) {
-            break (1, player1);
-        } else if player2.len() == 0 {
-            break (1, player1);
-        } else if player1.len() == 0 {
-            break (2, player2);
+            break (1, players);
+        } else if players[1].len() == 0 {
+            break (1, players);
+        } else if players[0].len() == 0 {
+            break (2, players);
         }
 
         played.insert(game_hash);
 
-        let p1 = player1.pop_front().unwrap();
-        let p2 = player2.pop_front().unwrap();
+        let p: Vec<usize> = players
+            .iter_mut()
+            .map(|player| player.pop_front().unwrap())
+            .collect();
 
-        let winner = if player1.len() >= p1 && player2.len() >= p2 {
-            let player1 = player1.iter().take(p1).copied().collect();
-            let player2 = player2.iter().take(p2).copied().collect();
-            play_star_two(player1, player2, game + 1).0
-        } else if p1 > p2 {
+        let winner = if players[0].len() >= p[0] && players[1].len() >= p[1] {
+            let players = players
+                .iter()
+                .enumerate()
+                .map(|(i, player)| player.iter().take(p[i]).copied().collect())
+                .collect();
+
+            play_star_two(players).0
+        } else if p[0] > p[1] {
             1
-        } else if p2 > p1 {
+        } else if p[1] > p[0] {
             2
         } else {
             panic!("Cards are equal")
         };
 
         if winner == 1 {
-            player1.push_back(p1);
-            player1.push_back(p2);
+            players[0].push_back(p[0]);
+            players[0].push_back(p[1]);
         } else {
-            player2.push_back(p2);
-            player2.push_back(p1);
+            players[1].push_back(p[1]);
+            players[1].push_back(p[0]);
         }
     }
 }
@@ -119,7 +122,7 @@ pub fn star_two(mut input: impl BufRead) -> usize {
     input
         .read_to_string(&mut input_str)
         .expect("Could not read all of string");
-    let mut players: Vec<VecDeque<usize>> = input_str
+    let players: Vec<VecDeque<usize>> = input_str
         .split("\n\n")
         .map(|section| {
             section
@@ -132,11 +135,10 @@ pub fn star_two(mut input: impl BufRead) -> usize {
                 .collect()
         })
         .collect();
-    let player2 = players.pop().unwrap();
-    let player1 = players.pop().unwrap();
 
-    let (winner, cards) = play_star_two(player1, player2, 1);
-    cards
+    let (winner, mut players) = play_star_two(players);
+    players
+        .remove(winner - 1)
         .into_iter()
         .rev()
         .enumerate()
