@@ -1,8 +1,4 @@
-use std::{
-    collections::HashMap,
-    hash::{BuildHasher, Hash, Hasher},
-    io::BufRead,
-};
+use std::{collections::LinkedList, io::BufRead, time::Instant};
 
 fn step(v: &mut Vec<usize>, current: usize, print: bool) -> usize {
     let current_value = v[current];
@@ -53,10 +49,62 @@ fn step(v: &mut Vec<usize>, current: usize, print: bool) -> usize {
     v.iter().position(|x| x == &current_value).unwrap()
 }
 
+fn step_linked(v: &mut LinkedList<usize>, max: usize) -> usize {
+    // let now = Instant::now();
+
+    let current_value = v.pop_front().unwrap();
+    let mut cursor = v.cursor_front_mut();
+    // dbg!(now.elapsed());
+    let mut d1 = current_value - 1;
+    cursor.move_next();
+    cursor.move_next();
+    cursor.move_next();
+    // dbg!(now.elapsed());
+
+    let taken_cups = cursor.split_before();
+    // dbg!(taken_cups);
+    // cursor.insert_before(current_value);
+
+    // dbg!(d1);
+    // dbg!(now.elapsed());
+    // Find destination cup value
+    let d = loop {
+        // Assume we dont have anythin less that 1
+        if d1 < 1 {
+            d1 = max;
+        }
+        if !taken_cups.contains(&d1) {
+            break d1;
+        } else {
+            d1 -= 1;
+        }
+    };
+    // dbg!(d);
+    // dbg!(now.elapsed());
+
+    while let Some(x) = cursor.current() {
+        if x == &d {
+            break;
+        } else {
+            cursor.move_next();
+        }
+    }
+    // dbg!(now.elapsed());
+
+    cursor.splice_after(taken_cups);
+    // dbg!(&other);
+
+    // dbg!(now.elapsed());
+    // let val = v.pop_front().unwrap();
+    // v.push_back(val);
+    v.push_back(current_value);
+
+    1
+}
 
 #[allow(dead_code, unused_variables)]
 pub fn star_one(input: impl BufRead) -> usize {
-    let mut v: Vec<usize> = input
+    let mut v: LinkedList<usize> = input
         .bytes()
         .map(|x| (x.unwrap() - b'0') as usize)
         .collect();
@@ -64,7 +112,7 @@ pub fn star_one(input: impl BufRead) -> usize {
 
     let max = *v.iter().max().unwrap();
     let min = *v.iter().min().unwrap();
-    let mut current_index = 0;
+    let current_index = 0;
     for round in 0..100 {
         println!("-- move {} --", round + 1);
         println!(
@@ -78,9 +126,7 @@ pub fn star_one(input: impl BufRead) -> usize {
                 })
                 .collect::<String>()
         );
-        current_index = step(&mut v, current_index, true);
-        // Get new current position
-        current_index = (current_index + 1) % v.len();
+        step_linked(&mut v, max);
     }
     println!("-- final --");
     println!(
@@ -94,15 +140,17 @@ pub fn star_one(input: impl BufRead) -> usize {
             })
             .collect::<String>()
     );
-    let mut c = v.splitn(2, |x| x == &1);
-    let part2 = c.next().unwrap().to_vec();
-    // part2.reverse();
+    let part2 = v.split_off(v.iter().position(|x| x == &1).unwrap());
     println!("{:?}", part2);
-    let part1 = c.next().unwrap();
+    let part1 = v;
     format!(
         "{}{}",
         part1.iter().map(|x| x.to_string()).collect::<String>(),
-        part2.iter().map(|x| x.to_string()).collect::<String>(),
+        part2
+            .iter()
+            .skip(1)
+            .map(|x| x.to_string())
+            .collect::<String>(),
     )
     .parse::<usize>()
     .unwrap()
@@ -115,53 +163,47 @@ pub fn star_two(input: impl BufRead) -> usize {
         .map(|x| (x.unwrap() - b'0') as usize)
         .collect();
     let max = *cups.iter().max().unwrap() + 1;
-    let upper = max + 1000000 - cups.len();
-    cups.extend(max..upper);
-    let mut current_index = 0;
+    let upper = 1_000_000;
+    cups.extend(max..=upper);
     let number_of_cups = cups.len();
-    let mut cache: HashMap<u64, Vec<usize>> = HashMap::new();
-    for round in 0..10000000 {
-        let s = cache.hasher();
-        let mut hasher = s.build_hasher();
-        current_index.hash(&mut hasher);
-        cups.hash(&mut hasher);
-        let hash = hasher.finish();
-        match cache.entry(hash) {
-            std::collections::hash_map::Entry::Occupied(e) => {
-                cups = e.get().clone();
-            }
-            std::collections::hash_map::Entry::Vacant(o) => {
-                step(&mut cups, current_index, false);
-                o.insert(cups.clone());
-            }
+    assert!(cups.contains(&1_000_000));
+
+    let mut cups: LinkedList<usize> = cups.into_iter().collect();
+    let number_of_rounds = 10_000_000;
+
+    let now = Instant::now();
+    let print_every = 10_000;
+    for round in 0..number_of_rounds {
+        step_linked(&mut cups, 1_000_000);
+        if round % print_every == 0 {
+            println!(
+                "{} : {}",
+                now.elapsed().as_micros() / print_every * (number_of_rounds - round * print_every),
+                round as f64 * 100f64 / number_of_rounds as f64
+            );
         }
-        // Get new current position
-        current_index = (current_index + 1) % number_of_cups;
     }
-    println!("-- final --");
-    println!(
-        "cups:  {}",
-        cups.iter()
-            .enumerate()
-            .map(|(i, x)| if i == current_index {
-                format!("({}) ", x)
-            } else {
-                format!("{} ", x)
-            })
-            .collect::<String>()
-    );
-    let mut c = cups.splitn(2, |x| x == &1);
-    let part2 = c.next().unwrap().to_vec();
-    // part2.reverse();
-    println!("{:?}", part2);
-    let part1 = c.next().unwrap();
-    format!(
-        "{}{}",
-        part1.iter().map(|x| x.to_string()).collect::<String>(),
-        part2.iter().map(|x| x.to_string()).collect::<String>(),
-    )
-    .parse::<usize>()
-    .unwrap()
+    // println!("-- final --");
+    // println!(
+    //     "cups:  {}",
+    //     cups.iter()
+    //         .enumerate()
+    //         .map(|(i, x)| if i == current_index {
+    //             format!("({}) ", x)
+    //         } else {
+    //             format!("{} ", x)
+    //         })
+    //         .collect::<String>()
+    // );
+    println!("Done, now to find 1");
+    while let Some(x) = cups.pop_front() {
+        if x == 1 {
+            break;
+        }
+    }
+    let cup1 = cups.pop_front().unwrap();
+    let cup2 = cups.pop_front().unwrap();
+    cup1 * cup2
 }
 
 #[cfg(test)]
@@ -223,6 +265,33 @@ mod tests {
     fn test_star_one() {
         let input = b"389125467";
         assert_eq!(star_one(Cursor::new(input)), 67384529);
+    }
+
+    #[test]
+    fn test_step_linked() {
+        let mut v: LinkedList<usize> = vec![3, 8, 9, 1, 2, 5, 4, 6, 7].into_iter().collect();
+
+        step_linked(&mut v, 9);
+        let expected = vec![2, 8, 9, 1, 5, 4, 6, 7, 3].into_iter().collect();
+        assert_eq!(v, expected);
+
+        step_linked(&mut v, 9);
+        let mut expected2 = vec![5, 4, 6, 7, 8, 9, 1, 3, 2].into_iter().collect();
+        assert_eq!(v, expected2);
+
+        step_linked(&mut expected2, 9);
+        let mut expected3 = vec![8, 9, 1, 3, 4, 6, 7, 2, 5].into_iter().collect();
+        assert_eq!(expected2, expected3);
+
+        step_linked(&mut expected3, 9);
+        let mut expected4 = vec![4, 6, 7, 9, 1, 3, 2, 5, 8].into_iter().collect();
+        assert_eq!(expected3, expected4);
+
+        step_linked(&mut expected4, 9);
+        assert_eq!(
+            expected4,
+            vec![1, 3, 6, 7, 9, 2, 5, 8, 4].into_iter().collect()
+        );
     }
 
     #[test]
