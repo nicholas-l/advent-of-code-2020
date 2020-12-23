@@ -1,4 +1,3 @@
-#![feature(linked_list_cursors)]
 use std::{
     io::BufRead,
     path::{Path, PathBuf},
@@ -420,6 +419,6 @@ mod tests {
         let (star_one, star_two, filename) = get_day(23);
 
         assert_eq!(star_one(get_data(&filename)), 94238657);
-        assert_eq!(star_two(get_data(&filename)), 33647);
+        assert_eq!(star_two(get_data(&filename)), 3072905352);
     }
 }
