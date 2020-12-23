@@ -43,7 +43,6 @@ enum Instruction {
     Memory(usize, usize),
 }
 
-#[allow(dead_code, unused_variables)]
 pub fn star_one(input: impl BufRead) -> usize {
     let mut instructions = parse_input(input).collect::<Vec<Instruction>>();
 
@@ -148,7 +147,6 @@ fn parse_input(input: impl BufRead) -> impl Iterator<Item = Instruction> {
     })
 }
 
-#[allow(dead_code, unused_variables)]
 pub fn star_two(input: impl BufRead) -> usize {
     let mut instructions = parse_input(input).collect::<Vec<Instruction>>();
 

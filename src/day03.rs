@@ -11,7 +11,6 @@ fn get_path<'a>(
         .map(move |(y, row)| row[(y / delta_y * delta_x) % row.len()])
 }
 
-#[allow(dead_code, unused_variables)]
 pub fn star_one(input: impl BufRead) -> usize {
     let map: Vec<Vec<char>> = input
         .lines()
@@ -24,7 +23,6 @@ pub fn star_one(input: impl BufRead) -> usize {
         .unwrap()
 }
 
-#[allow(dead_code, unused_variables)]
 pub fn star_two(input: impl BufRead) -> usize {
     let movements = vec![(1, 1), (1, 3), (1, 5), (1, 7), (2, 1)];
     let map: Vec<Vec<char>> = input

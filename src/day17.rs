@@ -180,11 +180,10 @@ fn parse_state(input: impl BufRead) -> State {
     state
 }
 
-#[allow(dead_code, unused_variables)]
 pub fn star_one(input: impl BufRead) -> usize {
     let mut state = parse_state(input);
     println!("{:?}", state);
-    for i in 0..6 {
+    for _i in 0..6 {
         state = step(state);
     }
     state
@@ -194,11 +193,10 @@ pub fn star_one(input: impl BufRead) -> usize {
         .count()
 }
 
-#[allow(dead_code, unused_variables)]
 pub fn star_two(input: impl BufRead) -> usize {
     let mut state = vec![parse_state(input)];
     println!("{:?}", state);
-    for i in 0..6 {
+    for _i in 0..6 {
         state = step2(state);
     }
     state

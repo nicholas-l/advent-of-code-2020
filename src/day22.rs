@@ -3,7 +3,6 @@ use std::{
     io::BufRead,
 };
 
-#[allow(dead_code, unused_variables)]
 pub fn star_one(mut input: impl BufRead) -> usize {
     let mut input_str = String::new();
     input
@@ -116,7 +115,6 @@ fn play_star_two(mut players: Vec<VecDeque<usize>>) -> (usize, Vec<VecDeque<usiz
     }
 }
 
-#[allow(dead_code, unused_variables)]
 pub fn star_two(mut input: impl BufRead) -> usize {
     let mut input_str = String::new();
     input

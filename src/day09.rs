@@ -30,7 +30,6 @@ fn xmas2(numbers: &[usize], value: usize) -> Option<Vec<usize>> {
     None
 }
 
-#[allow(dead_code, unused_variables)]
 pub fn star_one(input: impl BufRead) -> usize {
     let numbers: Vec<usize> = input
         .lines()
@@ -40,7 +39,6 @@ pub fn star_one(input: impl BufRead) -> usize {
     xmas(&numbers, 25)
 }
 
-#[allow(dead_code, unused_variables)]
 pub fn star_two(input: impl BufRead) -> usize {
     let numbers: Vec<usize> = input
         .lines()

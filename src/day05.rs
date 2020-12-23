@@ -34,7 +34,6 @@ impl FromStr for Seat {
     }
 }
 
-#[allow(dead_code, unused_variables)]
 pub fn star_one(input: impl BufRead) -> usize {
     input
         .lines()
@@ -44,7 +43,6 @@ pub fn star_one(input: impl BufRead) -> usize {
         .unwrap()
 }
 
-#[allow(dead_code, unused_variables)]
 pub fn star_two(input: impl BufRead) -> usize {
     let mut sorted_seats: Vec<usize> = input
         .lines()

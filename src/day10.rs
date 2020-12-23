@@ -1,10 +1,6 @@
-
-
 use std::collections::{BinaryHeap, HashMap, HashSet};
 use std::io::BufRead;
 
-
-#[allow(dead_code, unused_variables)]
 pub fn star_one(input: impl BufRead) -> usize {
     let mut data: Vec<usize> = input
         .lines()
@@ -15,17 +11,15 @@ pub fn star_one(input: impl BufRead) -> usize {
     let target = data.iter().max().unwrap() + 3;
     let mut current = 0;
     let mut diff_1 = 0;
-    let mut diff_2 = 0;
     let mut diff_3 = 0;
 
     while current != target {
-        current = if let Ok(i) = data.binary_search(&(current + 1)) {
+        current = if let Ok(_i) = data.binary_search(&(current + 1)) {
             diff_1 += 1;
             current + 1
-        } else if let Ok(i) = data.binary_search(&(current + 2)) {
-            diff_2 += 1;
+        } else if let Ok(_i) = data.binary_search(&(current + 2)) {
             current + 2
-        } else if let Ok(i) = data.binary_search(&(current + 3)) {
+        } else if let Ok(_i) = data.binary_search(&(current + 3)) {
             diff_3 += 1;
             current + 3
         } else {
@@ -47,7 +41,6 @@ fn number_to_target(cache: &HashMap<usize, usize>, current: usize, target: usize
         + cache.get(&(current + 3)).unwrap_or(&0)
 }
 
-#[allow(dead_code, unused_variables)]
 pub fn star_two(input: impl BufRead) -> usize {
     let mut data: Vec<usize> = input
         .lines()
@@ -70,14 +63,14 @@ pub fn star_two(input: impl BufRead) -> usize {
             done.insert(current);
             let number_of_paths = number_to_target(&cache, current, target);
             cache.insert(current, number_of_paths);
-            if let Ok(number) = data.binary_search(&(current.saturating_sub(1))) {
+            if let Ok(_i) = data.binary_search(&(current.saturating_sub(1))) {
                 stack.push(current - 1);
             }
-            if let Ok(number) = data.binary_search(&(current.saturating_sub(2))) {
+            if let Ok(_i) = data.binary_search(&(current.saturating_sub(2))) {
                 stack.push(current - 2);
             }
 
-            if let Ok(number) = data.binary_search(&(current.saturating_sub(3))) {
+            if let Ok(_i) = data.binary_search(&(current.saturating_sub(3))) {
                 stack.push(current - 3);
             }
         }

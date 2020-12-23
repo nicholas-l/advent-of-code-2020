@@ -32,7 +32,6 @@ enum Error {
     PointerOverflow,
 }
 
-#[allow(dead_code, unused_variables)]
 pub fn star_one(input: impl BufRead) -> usize {
     let instructions: Vec<Instruction> = input
         .lines()
@@ -77,7 +76,6 @@ fn run(instructions: &[Instruction], flip: usize) -> Result<usize, Error> {
     }
 }
 
-#[allow(dead_code, unused_variables)]
 pub fn star_two(input: impl BufRead) -> usize {
     let instructions: Vec<Instruction> = input
         .lines()
@@ -88,7 +86,7 @@ pub fn star_two(input: impl BufRead) -> usize {
         .iter()
         .enumerate()
         // Remove acculumator instructions
-        .filter(|(index, instruction)| match instruction {
+        .filter(|(_index, instruction)| match instruction {
             Instruction::Accumulate(_) => false,
             _ => true,
         })

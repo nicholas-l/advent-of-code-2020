@@ -53,12 +53,10 @@ fn run(input: impl BufRead, index: usize) -> usize {
         .unwrap()
 }
 
-#[allow(dead_code, unused_variables)]
 pub fn star_one(input: impl BufRead) -> usize {
     run(input, 2020)
 }
 
-#[allow(dead_code, unused_variables)]
 pub fn star_two(input: impl BufRead) -> usize {
     run(input, 30000000)
 }

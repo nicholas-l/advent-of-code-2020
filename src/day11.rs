@@ -117,7 +117,6 @@ fn get_new_state_two(map: &SeatMap, y: usize, x: usize) -> SeatStatus {
     get_new_state(map, y, x, map.len().max(map[0].len()) + 1, 5)
 }
 
-#[allow(dead_code, unused_variables)]
 pub fn star_one(input: impl BufRead) -> usize {
     let mut map: SeatMap = input
         .lines()
@@ -142,7 +141,6 @@ pub fn star_one(input: impl BufRead) -> usize {
     }
 }
 
-#[allow(dead_code, unused_variables)]
 pub fn star_two(input: impl BufRead) -> usize {
     let mut map: SeatMap = input
         .lines()

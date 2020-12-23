@@ -1,4 +1,4 @@
-use std::{io::BufRead};
+use std::io::BufRead;
 use std::{fmt::Debug, str::FromStr};
 
 #[derive(Copy, Clone, PartialEq)]
@@ -51,7 +51,7 @@ impl Ship {
                 if self.direction < 0 {
                     self.direction = 360 + self.direction
                 }
-            },
+            }
             Action::Right(dir) => {
                 // Action R means to turn right the given number of degrees.
                 self.direction += dir as isize;
@@ -86,7 +86,7 @@ impl Ship {
                     x = tmp.1;
                 }
                 (y, x)
-            },
+            }
             Action::Right(dir) => {
                 // Action R means to turn right the given number of degrees.
                 let turns = dir / 90;
@@ -105,7 +105,7 @@ impl Ship {
                 self.x = self.x + x * value as isize;
                 self.y = self.y + y * value as isize;
                 waypoint
-        },
+            }
         }
     }
 
@@ -114,7 +114,6 @@ impl Ship {
     }
 }
 
-#[allow(dead_code, unused_variables)]
 pub fn star_one(input: impl BufRead) -> usize {
     let mut ship = Ship {
         x: 0,
@@ -131,7 +130,6 @@ pub fn star_one(input: impl BufRead) -> usize {
     ship.manhatten_distance()
 }
 
-#[allow(dead_code, unused_variables)]
 pub fn star_two(input: impl BufRead) -> usize {
     let mut ship = Ship {
         x: 0,

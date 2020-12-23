@@ -12,12 +12,10 @@ fn get_product_matching_sum(input: impl BufRead, length: usize, sum: usize) -> u
         .expect("Could not find numbers")
 }
 
-#[allow(dead_code)]
 pub fn star_one(input: impl BufRead) -> usize {
     get_product_matching_sum(input, 2, 2020)
 }
 
-#[allow(dead_code)]
 pub fn star_two(input: impl BufRead) -> usize {
     get_product_matching_sum(input, 3, 2020)
 }

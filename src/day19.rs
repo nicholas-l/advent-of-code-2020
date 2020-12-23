@@ -37,7 +37,7 @@ fn parse_rule(input: &[&str]) -> Rule {
     }
 }
 /// This function returns None if the rule cannot match the input or Some if it can.
-/// The vector is the possible leftover input, which is important 
+/// The vector is the possible leftover input, which is important
 /// for backtracking when a branch does not complete.
 /// None => Failed to parse the input.
 /// Some(vec![]) => Completed successfully with no more input rest to parse.
@@ -78,10 +78,11 @@ fn match_rule<'a>(
             match_rule(map, new_rule, &input[..])
         }
         Rule::Alt(v) => {
-            let res: Vec<&[char]> = v.iter()
-                    .filter_map(|rule| match_rule(map, rule, &input[..]))
-                    .flatten()
-                    .collect();
+            let res: Vec<&[char]> = v
+                .iter()
+                .filter_map(|rule| match_rule(map, rule, &input[..]))
+                .flatten()
+                .collect();
             if res.len() == 0 {
                 None
             } else {
@@ -90,7 +91,6 @@ fn match_rule<'a>(
         }
     }
 }
-
 
 fn parse_rule_line(line: &str) -> (usize, Rule) {
     let index = line.split(':').next().unwrap().parse::<usize>().unwrap();
@@ -128,8 +128,6 @@ fn parse_input(mut input: impl BufRead, overrides: Option<&str>) -> (String, Has
     (values.to_string(), rules)
 }
 
-
-#[allow(dead_code, unused_variables)]
 pub fn star_one(input: impl BufRead) -> usize {
     let (values, rules) = parse_input(input, None);
     let rule0 = rules.get(&0).expect("Rule 0 not found");
@@ -143,7 +141,6 @@ pub fn star_one(input: impl BufRead) -> usize {
         .count()
 }
 
-#[allow(dead_code, unused_variables)]
 pub fn star_two(input: impl BufRead) -> usize {
     let overrides = "8: 42 | 42 8
 11: 42 31 | 42 11 31";

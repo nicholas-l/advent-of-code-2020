@@ -202,7 +202,6 @@ const VALID_SECTIONS: [&str; 7] = [
            // "cid", // (Country ID)
 ];
 
-#[allow(dead_code, unused_variables)]
 pub fn star_one(mut input: impl BufRead) -> usize {
     let mut input_str = String::new();
     input
@@ -220,7 +219,6 @@ pub fn star_one(mut input: impl BufRead) -> usize {
         .count()
 }
 
-#[allow(dead_code, unused_variables)]
 pub fn star_two(mut input: impl BufRead) -> usize {
     let mut input_str = String::new();
     input

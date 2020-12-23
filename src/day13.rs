@@ -1,6 +1,5 @@
 use std::io::BufRead;
 
-#[allow(dead_code, unused_variables)]
 pub fn star_one(input: impl BufRead) -> usize {
     let mut lines = input.lines();
     let start = lines.next().unwrap().unwrap().parse::<usize>().unwrap();
@@ -29,9 +28,7 @@ fn modinv(a: isize, m: isize) -> Option<isize> {
     (0..m).filter(|x| (a * x) % m == 1).next()
 }
 
-#[allow(dead_code, unused_variables)]
 pub fn star_two(input: impl BufRead) -> usize {
-    
     let ids: Vec<(isize, isize)> = input
         .lines()
         .skip(1)
@@ -40,7 +37,7 @@ pub fn star_two(input: impl BufRead) -> usize {
         .unwrap()
         .split(',')
         .enumerate()
-        .filter(|(i, x)| x != &"x")
+        .filter(|(_i, x)| x != &"x")
         .map(|(i, x)| (i as isize, x.parse::<isize>().unwrap()))
         .collect();
     let n_product: isize = ids.iter().map(|x| x.1).product();
@@ -56,9 +53,7 @@ pub fn star_two(input: impl BufRead) -> usize {
             let n = x.1;
             let a = x.1 - x.0;
             let n_product_n = n_product / n;
-            modinv(n_product_n, n)
-                .map(|s| a * s * n_product_n)
-                .unwrap()
+            modinv(n_product_n, n).map(|s| a * s * n_product_n).unwrap()
         })
         .sum::<isize>();
     (sum % n_product) as usize

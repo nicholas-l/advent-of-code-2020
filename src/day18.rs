@@ -171,7 +171,6 @@ fn eval_multiply(mut input: VecDeque<Op>) -> VecDeque<Op> {
     result
 }
 
-#[allow(dead_code, unused_variables)]
 pub fn star_one(mut input: impl BufRead) -> usize {
     let mut input_str = String::new();
     input
@@ -207,7 +206,6 @@ pub fn star_one(mut input: impl BufRead) -> usize {
         .sum()
 }
 
-#[allow(dead_code, unused_variables)]
 pub fn star_two(mut input: impl BufRead) -> usize {
     let mut input_str = String::new();
     input

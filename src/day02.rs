@@ -20,7 +20,6 @@ fn process_passwords(input: impl BufRead) -> impl Iterator<Item = (usize, usize,
     })
 }
 
-#[allow(dead_code)]
 pub fn star_one(input: impl BufRead) -> usize {
     process_passwords(input)
         .filter(|(min, max, letter, password)| {
@@ -38,7 +37,6 @@ pub fn star_one(input: impl BufRead) -> usize {
         .count()
 }
 
-#[allow(dead_code)]
 pub fn star_two(input: impl BufRead) -> usize {
     process_passwords(input)
         .filter(|(min, max, letter, password)| {

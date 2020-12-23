@@ -44,6 +44,7 @@ impl<T: Copy> List<T> {
     }
 
     /// Returns the number of elements in the list.
+    #[allow(dead_code)]
     fn len(&self) -> usize {
         self.arena.len()
     }
@@ -100,6 +101,7 @@ impl<T: Copy> List<T> {
     }
 
     /// Removes the element specified by `index`.
+    #[allow(dead_code)]
     fn remove(&mut self, index: usize) -> T {
         let node = self.arena.remove(index).unwrap();
 
@@ -212,18 +214,14 @@ fn step_linked(v: &mut List<usize>, lookup: &HashMap<usize, usize>, max: usize) 
     1
 }
 
-#[allow(dead_code, unused_variables)]
 pub fn star_one(input: impl BufRead) -> usize {
     let v: Vec<usize> = input
         .bytes()
         .map(|x| (x.unwrap() - b'0') as usize)
         .collect();
-    let number_of_cups = v.len();
 
     let max = *v.iter().max().unwrap();
-    let min = *v.iter().min().unwrap();
     let (mut list, lookup) = create_inputs(v);
-    let current_index = 0;
     for round in 0..100 {
         println!("-- move {} --", round + 1);
         // println!(
@@ -293,7 +291,6 @@ fn create_inputs(cups: Vec<usize>) -> (List<usize>, HashMap<usize, usize>) {
     (list, lookup)
 }
 
-#[allow(dead_code, unused_variables)]
 pub fn star_two(input: impl BufRead) -> usize {
     let mut cups: Vec<usize> = input
         .bytes()
@@ -303,7 +300,6 @@ pub fn star_two(input: impl BufRead) -> usize {
     let upper = 1_000_000;
     cups.extend(max..=upper);
 
-    let number_of_cups = cups.len();
     assert!(cups.contains(&1_000_000));
 
     let (mut list, lookup) = create_inputs(cups);

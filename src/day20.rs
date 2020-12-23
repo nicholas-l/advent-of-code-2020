@@ -206,7 +206,6 @@ fn transformations(tile: Tile) -> impl Iterator<Item = Tile> {
     tile_flips(tile).into_iter().flat_map(tile_rotations)
 }
 
-
 fn get_neighbour_ids(map: &Map, pos: &Position) -> Vec<usize> {
     [(-1, 0), (1, 0), (0, -1), (0, 1)]
         .iter()
@@ -282,7 +281,6 @@ fn parse_tiles(input_str: &String) -> impl Iterator<Item = Tile> + '_ {
         .map(|tile_str| tile_str.parse::<Tile>().unwrap())
 }
 
-#[allow(dead_code, unused_variables)]
 pub fn star_one(mut input: impl BufRead) -> usize {
     let mut input_str = String::new();
     input
@@ -333,8 +331,8 @@ pub fn star_one(mut input: impl BufRead) -> usize {
 
     return tile_tile
         .iter()
-        .filter(|(key, value)| value.len() == 2)
-        .map(|x| *x.0)
+        .filter(|(_key, value)| value.len() == 2)
+        .map(|(key, _value)| *key)
         .product();
 }
 
@@ -356,7 +354,6 @@ fn convert_to_matrix(map: &Map, width: usize) -> Vec<Vec<Pixel>> {
     }
     vec
 }
-
 
 fn search(matrix: &Matrix) -> usize {
     let sea_monster = vec![
@@ -437,7 +434,6 @@ fn print_map_content(map: &Map, width: usize, tile_width: usize) {
     println!("")
 }
 
-#[allow(dead_code, unused_variables)]
 pub fn star_two(mut input: impl BufRead) -> usize {
     let mut input_str = String::new();
     input
@@ -451,7 +447,7 @@ pub fn star_two(mut input: impl BufRead) -> usize {
         })
         .collect();
     let mut edge_to_tile_id = HashMap::new();
-    for (id, tile) in &tiles {
+    for (_id, tile) in &tiles {
         for t in transformations(tile.clone()) {
             edge_to_tile_id
                 .entry(t.left)
@@ -474,7 +470,7 @@ pub fn star_two(mut input: impl BufRead) -> usize {
 
     let mut tile_to_tile: HashMap<usize, HashSet<usize>> = HashMap::new();
 
-    for (id, tile) in &tiles {
+    for (_id, tile) in &tiles {
         for t in transformations(tile.clone()) {
             for id in &edge_to_tile_id[&t.left] {
                 if id != &t.id {
@@ -489,7 +485,7 @@ pub fn star_two(mut input: impl BufRead) -> usize {
 
     let (first_corner, first_neighbours) = tile_to_tile
         .iter()
-        .filter(|(key, value)| value.len() == 2)
+        .filter(|(_id, value)| value.len() == 2)
         .next()
         .unwrap();
 

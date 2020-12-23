@@ -28,7 +28,6 @@ fn get_valid_numbers(input: &str) -> HashSet<usize> {
         .collect()
 }
 
-#[allow(dead_code, unused_variables)]
 pub fn star_one(mut input: impl BufRead) -> usize {
     let mut input_str = String::new();
     input
@@ -45,9 +44,7 @@ pub fn star_one(mut input: impl BufRead) -> usize {
         .lines()
         .skip(1)
         .flat_map(|line| line.split(',').map(|x| x.parse::<usize>().unwrap()));
-    nearby_tickets
-        .filter(|x| !valid_numbers.contains(x))
-        .sum()
+    nearby_tickets.filter(|x| !valid_numbers.contains(x)).sum()
 }
 
 fn get_field_validation(input: &str) -> HashMap<String, (usize, usize, usize, usize)> {
@@ -71,7 +68,6 @@ fn validate_field(x: usize, (min1, max1, min2, max2): (usize, usize, usize, usiz
     (x >= min1 && x <= max1) || (x >= min2 && x <= max2)
 }
 
-#[allow(dead_code, unused_variables)]
 pub fn star_two(mut input: impl BufRead) -> usize {
     let mut input_str = String::new();
     input
@@ -132,7 +128,6 @@ pub fn star_two(mut input: impl BufRead) -> usize {
 
     possible_fields.sort_by_key(|x| Reverse(x.1.len()));
 
-
     let mut field_names = vec![""; number_of_fields];
 
     while let Some(x) = possible_fields.pop() {
@@ -149,8 +144,8 @@ pub fn star_two(mut input: impl BufRead) -> usize {
     field_names
         .into_iter()
         .enumerate()
-        .filter(|(i, name)| name.starts_with("departure"))
-        .map(|(i, name)| my_ticket[i])
+        .filter(|(_i, name)| name.starts_with("departure"))
+        .map(|(i, _name)| my_ticket[i])
         .product()
 }
 

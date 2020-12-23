@@ -8,7 +8,6 @@ lazy_static! {
     static ref RE: Regex = Regex::new(r"(?P<amount>\d{1,}) (?P<colour>.+) bag(s)?").unwrap();
 }
 
-#[allow(dead_code, unused_variables)]
 pub fn star_one(input: impl BufRead) -> usize {
     let hashmap = input
         .lines()
@@ -21,7 +20,7 @@ pub fn star_one(input: impl BufRead) -> usize {
                 .expect(&format!("Expected {} (parent: {})", x, parent));
             (parent.to_string(), children.to_string())
         })
-        .filter(|(parent, children)| children != "no other bags.")
+        .filter(|(_parent, children)| children != "no other bags.")
         .fold(HashMap::new(), |mut hm, (parent, children)| {
             for child in children.split(",") {
                 let captures = RE
@@ -63,7 +62,6 @@ fn get_number_of_bags(map: &HashMap<String, Vec<(String, usize)>>, id: &str) -> 
     }
 }
 
-#[allow(dead_code, unused_variables)]
 pub fn star_two(input: impl BufRead) -> usize {
     let hashmap: HashMap<_, Vec<(String, usize)>> = input
         .lines()
@@ -76,7 +74,7 @@ pub fn star_two(input: impl BufRead) -> usize {
                 .expect(&format!("Expected {} (parent: {})", x, parent));
             (parent.trim().to_string(), children.to_string())
         })
-        .filter(|(parent, children)| children != "no other bags.")
+        .filter(|(_parent, children)| children != "no other bags.")
         .map(|(parent, children)| {
             let children = children
                 .split(",")
