@@ -239,6 +239,7 @@ pub fn star_one(input: impl BufRead) -> usize {
         step_linked(&mut list, &lookup, max);
     }
     println!("-- final --");
+    println!("{:?}", list.to_vec());
     // println!(
     //     "cups:  {}",
     //     v.iter()
@@ -257,20 +258,27 @@ pub fn star_one(input: impl BufRead) -> usize {
         // dbg!(node);
         res.push(node.value);
         current = node;
-        if current.next == NULL || current.value == 1 {
+        if current.next == NULL {
+            break;
+        }
+        if current.value == 1 {
             break;
         }
     }
 
     println!("first");
+    dbg!(&res);
+    dbg!(&current);
     let mut current = list.arena.get(list.head).unwrap();
-    res.push(current.value);
-    while let Some(node) = list.arena.get(current.next) {
-        if node.value == 1 {
-            break;
+    if current.value != 1 {
+        res.push(current.value);
+        while let Some(node) = list.arena.get(current.next) {
+            if node.value == 1 {
+                break;
+            }
+            res.push(node.value);
+            current = node;
         }
-        res.push(node.value);
-        current = node;
     }
 
     println!("first");
