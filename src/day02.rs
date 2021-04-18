@@ -42,7 +42,7 @@ pub fn star_two(input: impl BufRead) -> usize {
         .filter(|(min, max, letter, password)| {
             let chars: Vec<char> = password.chars().collect();
             if *min > chars.len() || *max > chars.len() {
-                panic!(format!("Bad line: {}", password));
+                panic!("Bad line: {}", password);
             }
             (chars[*min - 1] == *letter) ^ (chars[*max - 1] == *letter)
         })

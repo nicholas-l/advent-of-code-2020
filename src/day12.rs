@@ -64,7 +64,7 @@ impl Ship {
                 90 => self.x += value as isize,
                 180 => self.y -= value as isize,
                 270 => self.x -= value as isize,
-                _ => panic!(format!("bad direction {}", self.direction)),
+                _ => panic!("bad direction {}", self.direction),
             },
         };
     }

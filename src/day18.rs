@@ -80,7 +80,7 @@ fn eval_addition_multiply(mut input: VecDeque<Op>) -> VecDeque<Op> {
             // Get next char
             let b = match input.pop_front() {
                 Some(Op::Value(v)) => v,
-                x => panic!(format!("{:?}", x)),
+                x => panic!("{:?}", x),
             };
             result.push_back(Op::Value(a * b));
         } else {
@@ -161,7 +161,7 @@ fn eval_multiply(mut input: VecDeque<Op>) -> VecDeque<Op> {
             // Get next char
             let b = match input.pop_front() {
                 Some(Op::Value(v)) => v,
-                x => panic!(format!("{:?}", x)),
+                x => panic!("{:?}", x),
             };
             result.push_back(Op::Value(a * b));
         } else {

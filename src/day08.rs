@@ -22,7 +22,7 @@ impl FromStr for Instruction {
             }
             "jmp" => Ok(Instruction::Jump(chars[1].parse().unwrap())),
             "nop" => Ok(Instruction::NoOperation(chars[1].parse().unwrap())),
-            _ => panic!(format!("Could not parse {} to Instruction", s)),
+            _ => panic!("Could not parse {} to Instruction", s),
         }
     }
 }
