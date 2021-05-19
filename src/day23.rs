@@ -1,6 +1,6 @@
 use std::{collections::HashMap, io::BufRead};
 
-use vec_arena::Arena;
+use slab::Slab;
 // https://github.com/smol-rs/vec-arena/blob/master/examples/linked-list.rs
 /// The null index, akin to null pointers.
 ///
@@ -24,7 +24,7 @@ struct Node<T> {
 
 struct List<T> {
     /// This is where nodes are stored.
-    arena: Arena<Node<T>>,
+    arena: Slab<Node<T>>,
 
     /// First node in the list.
     head: usize,
@@ -37,7 +37,7 @@ impl<T: Copy> List<T> {
     /// Constructs a new, empty doubly linked list.
     fn new() -> Self {
         List {
-            arena: Arena::new(),
+            arena: Slab::new(),
             head: NULL,
             tail: NULL,
         }
@@ -79,14 +79,18 @@ impl<T: Copy> List<T> {
 
     /// Pops and returns the value at the front of the list.
     fn pop_front(&mut self) -> Option<T> {
-        self.arena.remove(self.head).map(|node| {
+        if self.arena.contains(self.head) {
+            let node = self.arena.remove(self.head);
             self.link(NULL, node.next);
             self.head = node.next;
             if node.next == NULL {
                 self.tail = NULL;
             }
-            node.value
-        })
+            Some(node.value)
+        } else {
+            None
+        }
+        
     }
 
     fn to_vec(&self) -> Vec<T> {
@@ -103,7 +107,7 @@ impl<T: Copy> List<T> {
     /// Removes the element specified by `index`.
     #[allow(dead_code)]
     fn remove(&mut self, index: usize) -> T {
-        let node = self.arena.remove(index).unwrap();
+        let node = self.arena.remove(index);
 
         self.link(node.prev, node.next);
         if self.head == index {
