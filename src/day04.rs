@@ -48,12 +48,12 @@ impl FromStr for Length {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         HEIGHT_REGEX
             .captures(s)
-            .ok_or("Wrong format for length".to_string())
+            .ok_or_else(|| "Wrong format for length".to_string())
             .map(|captures| {
                 Ok(Length {
                     value: captures
                         .name("value")
-                        .ok_or("Unable to get value when parsing length".to_string())
+                        .ok_or_else(|| "Unable to get value when parsing length".to_string())
                         .and_then(|value| {
                             value.as_str().parse().map_err(|_e| {
                                 format!(
@@ -64,7 +64,7 @@ impl FromStr for Length {
                         })?,
                     unit: captures
                         .name("unit")
-                        .ok_or("Unable to get unit when parsing length".to_string())
+                        .ok_or_else(|| "Unable to get unit when parsing length".to_string())
                         .and_then(|value| {
                             value.as_str().parse().map_err(|_e| {
                                 format!(
@@ -79,14 +79,14 @@ impl FromStr for Length {
 }
 #[derive(Debug)]
 enum Colour {
-    RGB(usize, usize, usize),
+    Rgb(usize, usize, usize),
 }
 
 impl FromStr for Colour {
     type Err = String;
 
     fn from_str(_s: &str) -> Result<Self, Self::Err> {
-        Ok(Colour::RGB(0, 0, 0))
+        Ok(Colour::Rgb(0, 0, 0))
     }
 }
 
@@ -133,7 +133,7 @@ impl FromStr for Passport {
         Ok(Passport {
             birth_year: hm
                 .get("byr")
-                .ok_or("Unable to get birth year".to_string())
+                .ok_or_else(|| "Unable to get birth year".to_string())
                 .and_then(|value| {
                     value
                         .parse()
@@ -141,7 +141,7 @@ impl FromStr for Passport {
                 })?,
             issue_year: hm
                 .get("iyr")
-                .ok_or("Unable to get issue year".to_string())
+                .ok_or_else(|| "Unable to get issue year".to_string())
                 .and_then(|value| {
                     value
                         .parse()
@@ -149,7 +149,7 @@ impl FromStr for Passport {
                 })?,
             expiry_year: hm
                 .get("eyr")
-                .ok_or("Unable to get expiry year".to_string())
+                .ok_or_else(|| "Unable to get expiry year".to_string())
                 .and_then(|value| {
                     value
                         .parse()
@@ -157,7 +157,7 @@ impl FromStr for Passport {
                 })?,
             height: hm
                 .get("hgt")
-                .ok_or("Unable to get height".to_string())
+                .ok_or_else(|| "Unable to get height".to_string())
                 .and_then(|value| {
                     value
                         .parse::<Length>()
@@ -165,7 +165,7 @@ impl FromStr for Passport {
                 })?,
             hair_colour: hm
                 .get("hcl")
-                .ok_or("Unable to get hair colour".to_string())
+                .ok_or_else(|| "Unable to get hair colour".to_string())
                 .and_then(|value| {
                     value
                         .parse()
@@ -173,7 +173,7 @@ impl FromStr for Passport {
                 })?,
             eye_colour: hm
                 .get("ecl")
-                .ok_or("Unable to get eye colour".to_string())
+                .ok_or_else(|| "Unable to get eye colour".to_string())
                 .and_then(|value| {
                     value
                         .parse()
@@ -181,7 +181,7 @@ impl FromStr for Passport {
                 })?,
             personal_id: hm
                 .get("pid")
-                .ok_or("Unable to get personal id".to_string())
+                .ok_or_else(|| "Unable to get personal id".to_string())
                 .and_then(|value| {
                     value
                         .parse()

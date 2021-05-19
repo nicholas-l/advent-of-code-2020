@@ -9,14 +9,14 @@ enum Rule {
 }
 
 fn parse_single(input: &str) -> Rule {
-    if input.contains("\"") {
+    if input.contains('\"') {
         let v: Vec<char> = input.chars().collect();
         if v.len() != 3 {
             panic!("Input length is not a char: {}", input)
         }
-        return Rule::Value(v[1]);
-    } else if let Ok(value) = usize::from_str_radix(input, 10) {
-        return Rule::Ref(value);
+        Rule::Value(v[1])
+    } else if let Ok(value) = input.parse::<usize>() {
+        Rule::Ref(value)
     } else {
         panic!("Unable to parse");
     }
@@ -52,22 +52,21 @@ fn match_rule<'a>(
     // println!("{:?}: {:?}", rule, input);
     match rule {
         Rule::Multiple(v) => {
-            let remainder = &input[..];
-            let mut new_remainders = vec![remainder];
+            let mut new_remainders = vec![input];
             for rule in v {
                 new_remainders = new_remainders
                     .into_iter()
                     .filter_map(|remainder| match_rule(map, rule, remainder))
                     .flatten()
                     .collect();
-                if new_remainders.len() == 0 {
+                if new_remainders.is_empty() {
                     return None;
                 }
             }
             Some(new_remainders)
         }
         Rule::Value(c) => {
-            if input.len() > 0 && input[0] == *c {
+            if !input.is_empty() && input[0] == *c {
                 Some(vec![&input[1..]])
             } else {
                 None
@@ -75,15 +74,15 @@ fn match_rule<'a>(
         }
         Rule::Ref(i) => {
             let new_rule = map.get(&i).expect("Could not find rule in match rule");
-            match_rule(map, new_rule, &input[..])
+            match_rule(map, new_rule, input)
         }
         Rule::Alt(v) => {
             let res: Vec<&[char]> = v
                 .iter()
-                .filter_map(|rule| match_rule(map, rule, &input[..]))
+                .filter_map(|rule| match_rule(map, rule, input))
                 .flatten()
                 .collect();
-            if res.len() == 0 {
+            if res.is_empty() {
                 None
             } else {
                 Some(res)
@@ -96,8 +95,7 @@ fn parse_rule_line(line: &str) -> (usize, Rule) {
     let index = line.split(':').next().unwrap().parse::<usize>().unwrap();
     let rule_string: Vec<&str> = line
         .split(':')
-        .skip(1)
-        .next()
+        .nth(1)
         .unwrap()
         .trim()
         .split_whitespace()
@@ -136,7 +134,7 @@ pub fn star_one(input: impl BufRead) -> usize {
         .filter(|line| {
             let chars: Vec<char> = line.chars().collect();
             let res = match_rule(&rules, rule0, &chars[..]);
-            res.map(|r| r.iter().any(|r| r.len() == 0)).unwrap_or(false)
+            res.map(|r| r.iter().any(|r| r.is_empty())).unwrap_or(false)
         })
         .count()
 }
@@ -154,7 +152,7 @@ pub fn star_two(input: impl BufRead) -> usize {
             let chars: Vec<char> = line.trim().chars().collect();
             let res = match_rule(&rules, rule0, &chars[..]);
             // Check if any of the inputs left to parse is empty.
-            res.map(|r| r.iter().any(|r| r.len() == 0)).unwrap_or(false)
+            res.map(|r| r.iter().any(|r| r.is_empty())).unwrap_or(false)
         })
         .count()
 }

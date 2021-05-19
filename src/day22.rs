@@ -16,14 +16,14 @@ pub fn star_one(mut input: impl BufRead) -> usize {
                 .skip(1)
                 .map(|x| {
                     x.parse::<usize>()
-                        .expect(&format!("Could not parse card: {}", x))
+                        .unwrap_or_else(|_| panic!("Could not parse card: {}", x))
                 })
                 .collect()
         })
         .collect();
     let mut player2 = players.pop().unwrap();
     let mut player1 = players.pop().unwrap();
-    while player2.len() > 0 && player1.len() > 0 {
+    while !player2.is_empty() && !player1.is_empty() {
         let p1 = player1.pop_front().unwrap();
         let p2 = player2.pop_front().unwrap();
         match (p1, p2) {
@@ -39,7 +39,7 @@ pub fn star_one(mut input: impl BufRead) -> usize {
         }
     }
 
-    if player1.len() > 0 {
+    if !player1.is_empty() {
         println!("Player1");
         println!("{:?}", player1);
         player1
@@ -59,7 +59,7 @@ pub fn star_one(mut input: impl BufRead) -> usize {
     }
 }
 
-fn get_hash(players: &Vec<VecDeque<usize>>) -> u64 {
+fn get_hash(players: &[VecDeque<usize>]) -> u64 {
     use std::collections::hash_map::DefaultHasher;
     use std::hash::{Hash, Hasher};
 
@@ -74,11 +74,9 @@ fn play_star_two(mut players: Vec<VecDeque<usize>>) -> (usize, Vec<VecDeque<usiz
     let mut played = HashSet::new();
     loop {
         let game_hash = get_hash(&players);
-        if played.contains(&game_hash) {
+        if played.contains(&game_hash) || players[1].is_empty() {
             break (1, players);
-        } else if players[1].len() == 0 {
-            break (1, players);
-        } else if players[0].len() == 0 {
+        } else if players[0].is_empty() {
             break (2, players);
         }
 
@@ -128,7 +126,7 @@ pub fn star_two(mut input: impl BufRead) -> usize {
                 .skip(1)
                 .map(|x| {
                     x.parse::<usize>()
-                        .expect(&format!("Could not parse card: {}", x))
+                        .unwrap_or_else(|_| panic!("Could not parse card: {}", x))
                 })
                 .collect()
         })

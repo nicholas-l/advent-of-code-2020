@@ -242,7 +242,7 @@ pub fn get_day(day: usize) -> (DayFn, DayFn, PathBuf) {
                 Path::new("data").join("day25.txt"),
             )
         }
-        
+
         x => {
             unimplemented!("Have not implemented day {}", x);
         }
@@ -385,7 +385,6 @@ mod tests {
         assert_eq!(star_one(get_data(&filename)), 25972);
         assert_eq!(star_two(get_data(&filename)), 622670335901);
     }
-
 
     #[test]
     fn day17_complete() {

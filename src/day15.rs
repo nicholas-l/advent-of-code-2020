@@ -48,8 +48,7 @@ fn run(input: impl BufRead, index: usize) -> usize {
             // println!("{}", value);
             Some(value)
         })
-        .skip(index - start - 1)
-        .next()
+        .nth(index - start - 1)
         .unwrap()
 }
 

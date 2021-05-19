@@ -47,16 +47,16 @@ impl Ship {
             Action::West(x) => self.x -= x as isize, // Action W means to move west by the given value.
             Action::Left(dir) => {
                 // Action L means to turn left the given number of degrees.
-                self.direction = self.direction - dir as isize;
+                self.direction -= dir as isize;
                 if self.direction < 0 {
-                    self.direction = 360 + self.direction
+                    self.direction += 360
                 }
             }
             Action::Right(dir) => {
                 // Action R means to turn right the given number of degrees.
                 self.direction += dir as isize;
                 if self.direction >= 360 {
-                    self.direction = self.direction - 360
+                    self.direction -= 360
                 }
             }
             Action::Forward(value) => match self.direction {
@@ -102,8 +102,8 @@ impl Ship {
             Action::Forward(value) => {
                 let x = waypoint.1;
                 let y = waypoint.0;
-                self.x = self.x + x * value as isize;
-                self.y = self.y + y * value as isize;
+                self.x += x * value as isize;
+                self.y += y * value as isize;
                 waypoint
             }
         }

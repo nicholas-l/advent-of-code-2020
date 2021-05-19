@@ -6,8 +6,7 @@ fn get_product_matching_sum(input: impl BufRead, length: usize, sum: usize) -> u
         .lines()
         .map(|x| x.unwrap().parse::<usize>().unwrap())
         .permutations(length)
-        .filter(|x| x.iter().sum::<usize>() == sum)
-        .next()
+        .find(|x| x.iter().sum::<usize>() == sum)
         .map(|x| x.iter().product())
         .expect("Could not find numbers")
 }

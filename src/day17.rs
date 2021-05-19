@@ -30,7 +30,7 @@ impl Debug for Cube {
 
 type State = Vec<Vec<Vec<Cube>>>;
 
-fn count_active(state: &State, i: usize, j: usize, k: usize) -> usize {
+fn count_active(state: &[Vec<Vec<Cube>>], i: usize, j: usize, k: usize) -> usize {
     let dirs = (-1..=1)
         .flat_map(|i| {
             (-1..=1)
@@ -89,13 +89,7 @@ fn step(state: Vec<Vec<Vec<Cube>>>) -> Vec<Vec<Vec<Cube>>> {
     new_state
 }
 
-fn count_active2(
-    state: &Vec<Vec<Vec<Vec<Cube>>>>,
-    i: usize,
-    j: usize,
-    k: usize,
-    w: usize,
-) -> usize {
+fn count_active2(state: &[Vec<Vec<Vec<Cube>>>], i: usize, j: usize, k: usize, w: usize) -> usize {
     // Calculate all the relative positions for the neighbours.
     let dirs = (-1..=1)
         .flat_map(|i| {
@@ -175,9 +169,7 @@ fn parse_state(input: impl BufRead) -> State {
         .filter_map(Result::ok)
         .map(|line| line.chars().map(|c| Cube::try_from(c).unwrap()).collect())
         .collect();
-    let mut state = Vec::new();
-    state.push(numbers);
-    state
+    vec![numbers]
 }
 
 pub fn star_one(input: impl BufRead) -> usize {
@@ -188,7 +180,7 @@ pub fn star_one(input: impl BufRead) -> usize {
     }
     state
         .into_iter()
-        .flat_map(|plane| plane.into_iter().flat_map(|row| row))
+        .flat_map(|plane| plane.into_iter().flatten())
         .filter(|x| x == &Cube::Active)
         .count()
 }
@@ -203,7 +195,7 @@ pub fn star_two(input: impl BufRead) -> usize {
         .into_iter()
         .flat_map(|cube| {
             cube.into_iter()
-                .flat_map(|plane| plane.into_iter().flat_map(|row| row))
+                .flat_map(|plane| plane.into_iter().flatten())
         })
         .filter(|x| x == &Cube::Active)
         .count()
@@ -220,9 +212,9 @@ mod tests {
                 for x in row {
                     print!("{:?}", x);
                 }
-                println!("");
+                println!();
             }
-            println!("");
+            println!();
         }
     }
 
@@ -233,9 +225,9 @@ mod tests {
                     for x in row {
                         print!("{:?}", x);
                     }
-                    println!("");
+                    println!();
                 }
-                println!("");
+                println!();
             }
         }
     }

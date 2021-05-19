@@ -49,7 +49,7 @@ pub fn star_two(input: impl BufRead) -> usize {
         .map(|s| s.unwrap().parse::<Seat>().unwrap())
         .map(|seat| seat.get_id())
         .collect();
-    sorted_seats.sort();
+    sorted_seats.sort_unstable();
 
     sorted_seats
         .windows(2)

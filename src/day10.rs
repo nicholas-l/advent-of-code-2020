@@ -7,7 +7,7 @@ pub fn star_one(input: impl BufRead) -> usize {
         .filter_map(Result::ok)
         .map(|line| line.trim().parse().unwrap())
         .collect();
-    data.sort();
+    data.sort_unstable();
     let target = data.iter().max().unwrap() + 3;
     let mut current = 0;
     let mut diff_1 = 0;
@@ -47,7 +47,7 @@ pub fn star_two(input: impl BufRead) -> usize {
         .filter_map(Result::ok)
         .map(|line| line.trim().parse().unwrap())
         .collect();
-    data.sort();
+    data.sort_unstable();
     let target = data.iter().max().unwrap() + 3;
 
     // We need to get process the largest values first.

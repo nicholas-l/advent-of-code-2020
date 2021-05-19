@@ -36,7 +36,7 @@ pub fn star_one(input: impl BufRead) -> usize {
             match hm.entry(allergen.to_string()) {
                 Entry::Occupied(mut e) => {
                     let v = e.get();
-                    let v = v.intersection(&hs).map(|&s| s).collect();
+                    let v = v.intersection(&hs).copied().collect();
                     e.insert(v);
                 }
                 Entry::Vacant(o) => {
@@ -55,7 +55,7 @@ pub fn star_one(input: impl BufRead) -> usize {
     possible_labels.sort_by_key(|x| Reverse(x.1.len()));
 
     let mut labels = HashMap::new();
-    while possible_labels.len() > 0 {
+    while !possible_labels.is_empty() {
         let (allergen, possible_ing) = possible_labels.pop().unwrap();
         if possible_ing.len() != 1 {
             panic!(
@@ -109,7 +109,7 @@ pub fn star_two(input: impl BufRead) -> usize {
             match hm.entry(allergen.to_string()) {
                 Entry::Occupied(mut e) => {
                     let v = e.get();
-                    let v = v.intersection(&hs).map(|&s| s).collect();
+                    let v = v.intersection(&hs).copied().collect();
                     e.insert(v);
                 }
                 Entry::Vacant(o) => {
@@ -128,7 +128,7 @@ pub fn star_two(input: impl BufRead) -> usize {
     possible_labels.sort_by_key(|x| Reverse(x.1.len()));
 
     let mut labels = HashMap::new();
-    while possible_labels.len() > 0 {
+    while !possible_labels.is_empty() {
         let (allergen, possible_ing) = possible_labels.pop().unwrap();
         if possible_ing.len() != 1 {
             panic!("Possible ingredients are not 1!");
@@ -158,7 +158,7 @@ pub fn star_two(input: impl BufRead) -> usize {
         "{}",
         label_list
             .into_iter()
-            .map(|x| x.0.clone())
+            .map(|x| *x.0)
             .cloned()
             .collect::<Vec<String>>()
             .join(",")

@@ -6,7 +6,7 @@ fn xmas(numbers: &[usize], length: usize) -> usize {
         .iter()
         .skip(length)
         .enumerate()
-        .filter(|(index, &number)| {
+        .find(|(index, &number)| {
             for p in numbers[*index..(index + length)].iter().permutations(2) {
                 if p[0] + p[1] == number {
                     return false;
@@ -14,7 +14,6 @@ fn xmas(numbers: &[usize], length: usize) -> usize {
             }
             true
         })
-        .next()
         .unwrap()
         .1
 }
@@ -23,7 +22,7 @@ fn xmas2(numbers: &[usize], value: usize) -> Option<Vec<usize>> {
     for k in 2..numbers.len() {
         for p in numbers.windows(k) {
             if p.iter().sum::<usize>() == value {
-                return Some(p.into_iter().map(|&x| x).collect());
+                return Some(p.iter().copied().collect());
             }
         }
     }

@@ -64,7 +64,7 @@ impl<T: Copy> List<T> {
         let node = self.arena.insert(Node {
             prev: NULL,
             next: NULL,
-            value: value,
+            value,
         });
 
         let tail = self.tail;
@@ -121,7 +121,7 @@ impl<T: Copy> List<T> {
             let node = self.arena.insert(Node {
                 prev: NULL,
                 next: NULL,
-                value: value,
+                value,
             });
             let after = self.arena.get(index).unwrap().next;
             self.link(index, node);

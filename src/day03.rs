@@ -1,10 +1,10 @@
 use std::io::BufRead;
 
-fn get_path<'a>(
-    map: &'a Vec<Vec<char>>,
+fn get_path(
+    map: &'_ [Vec<char>],
     delta_y: usize,
     delta_x: usize,
-) -> impl Iterator<Item = char> + 'a {
+) -> impl Iterator<Item = char> + '_ {
     map.iter()
         .enumerate()
         .filter(move |y| y.0 % delta_y == 0)

@@ -25,14 +25,13 @@ pub fn star_one(input: impl BufRead) -> usize {
 
 fn modinv(a: isize, m: isize) -> Option<isize> {
     let a = a % m;
-    (0..m).filter(|x| (a * x) % m == 1).next()
+    (0..m).find(|x| (a * x) % m == 1)
 }
 
 pub fn star_two(input: impl BufRead) -> usize {
     let ids: Vec<(isize, isize)> = input
         .lines()
-        .skip(1)
-        .next()
+        .nth(1)
         .unwrap()
         .unwrap()
         .split(',')

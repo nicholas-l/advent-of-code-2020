@@ -13,13 +13,13 @@ impl FromStr for Instruction {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let chars: Vec<&str> = s.split(" ").collect();
+        let chars: Vec<&str> = s.split(' ').collect();
         match chars[0] {
-            "acc" => {
-                Ok(Instruction::Accumulate(chars[1].parse::<isize>().expect(
-                    &format!("Could not convert {} to usize", chars[1]),
-                )))
-            }
+            "acc" => Ok(Instruction::Accumulate(
+                chars[1]
+                    .parse::<isize>()
+                    .unwrap_or_else(|_| panic!("Could not convert {} to usize", chars[1])),
+            )),
             "jmp" => Ok(Instruction::Jump(chars[1].parse().unwrap())),
             "nop" => Ok(Instruction::NoOperation(chars[1].parse().unwrap())),
             _ => panic!("Could not parse {} to Instruction", s),
@@ -68,7 +68,7 @@ fn run(instructions: &[Instruction], flip: usize) -> Result<usize, Error> {
                 (false, Instruction::Jump(value)) => (pointer as isize + value) as usize,
                 (true, Instruction::Jump(_)) => pointer + 1,
                 (_, Instruction::Accumulate(value)) => {
-                    acc = acc + value;
+                    acc += value;
                     pointer + 1
                 }
             }
@@ -86,10 +86,7 @@ pub fn star_two(input: impl BufRead) -> usize {
         .iter()
         .enumerate()
         // Remove acculumator instructions
-        .filter(|(_index, instruction)| match instruction {
-            Instruction::Accumulate(_) => false,
-            _ => true,
-        })
+        .filter(|(_index, instruction)| !matches!(instruction, Instruction::Accumulate(_)))
         .map(|x| x.0)
         .filter_map(|index| run(&instructions, index).ok())
         .next()

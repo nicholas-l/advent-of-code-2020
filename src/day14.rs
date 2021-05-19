@@ -127,7 +127,7 @@ fn parse_input(input: impl BufRead) -> impl Iterator<Item = Instruction> {
             "mem" => {
                 let captures = RE
                     .captures(&line)
-                    .expect(&format!("Could not match {} with regex", line));
+                    .unwrap_or_else(|| panic!("Could not match {} with regex", line));
                 let index = captures
                     .name("index")
                     .unwrap()

@@ -17,12 +17,12 @@ pub fn star_one(input: impl BufRead) -> usize {
             let parent = iter.next().unwrap();
             let children = iter
                 .next()
-                .expect(&format!("Expected {} (parent: {})", x, parent));
+                .unwrap_or_else(|| panic!("Expected {} (parent: {})", x, parent));
             (parent.to_string(), children.to_string())
         })
         .filter(|(_parent, children)| children != "no other bags.")
         .fold(HashMap::new(), |mut hm, (parent, children)| {
-            for child in children.split(",") {
+            for child in children.split(',') {
                 let captures = RE
                     .captures(&child)
                     .expect("Bad line that does not match regex.");
@@ -33,8 +33,7 @@ pub fn star_one(input: impl BufRead) -> usize {
             }
             hm
         });
-    let mut stack = Vec::new();
-    stack.push("shiny gold");
+    let mut stack = vec!["shiny gold"];
     let mut visited = HashSet::new();
     while let Some(node) = stack.pop() {
         if !visited.contains(node) {
@@ -71,13 +70,13 @@ pub fn star_two(input: impl BufRead) -> usize {
             let parent = iter.next().unwrap();
             let children = iter
                 .next()
-                .expect(&format!("Expected {} (parent: {})", x, parent));
+                .unwrap_or_else(|| panic!("Expected {} (parent: {})", x, parent));
             (parent.trim().to_string(), children.to_string())
         })
         .filter(|(_parent, children)| children != "no other bags.")
         .map(|(parent, children)| {
             let children = children
-                .split(",")
+                .split(',')
                 .map(|child| {
                     let captures = RE
                         .captures(&child)

@@ -132,7 +132,7 @@ impl FromStr for Tile {
     }
 }
 
-fn matrix_flip(matrix: &Matrix, axis: usize) -> Vec<Vec<Pixel>> {
+fn matrix_flip(matrix: &[Vec<Pixel>], axis: usize) -> Vec<Vec<Pixel>> {
     match axis {
         0 => matrix.iter().rev().cloned().collect(),
         1 => matrix
@@ -143,12 +143,12 @@ fn matrix_flip(matrix: &Matrix, axis: usize) -> Vec<Vec<Pixel>> {
     }
 }
 
-fn matrix_rotate(matrix: &Vec<Vec<Pixel>>) -> Vec<Vec<Pixel>> {
-    let mut new_matrix = matrix.clone();
+fn matrix_rotate(matrix: &[Vec<Pixel>]) -> Vec<Vec<Pixel>> {
+    let mut new_matrix = matrix.to_owned();
     let matrix_height = matrix.len();
     for i in 0..matrix.len() {
-        for j in 0..matrix[i].len() {
-            new_matrix[j][i] = matrix[matrix_height - 1 - i][j];
+        for (j, row) in new_matrix.iter_mut().enumerate().take(matrix[i].len()) {
+            row[i] = matrix[matrix_height - 1 - i][j];
         }
     }
     new_matrix
@@ -235,7 +235,7 @@ fn solve<'a>(
 ) -> bool {
     if depth == width * width {
         println!("Found!");
-        return true;
+        true
     } else {
         let position = ((depth / width) as isize, (depth % width) as isize);
         // println!("{}: Checking {}, {:?}", extra, width, depth);
@@ -275,7 +275,7 @@ fn solve<'a>(
     }
 }
 
-fn parse_tiles(input_str: &String) -> impl Iterator<Item = Tile> + '_ {
+fn parse_tiles(input_str: &str) -> impl Iterator<Item = Tile> + '_ {
     input_str
         .split("\n\n")
         .map(|tile_str| tile_str.parse::<Tile>().unwrap())
@@ -286,9 +286,7 @@ pub fn star_one(mut input: impl BufRead) -> usize {
     input
         .read_to_string(&mut input_str)
         .expect("Could not read all of string");
-    let mut tiles: Vec<Tile> = parse_tiles(&input_str)
-        .flat_map(|tile| transformations(tile))
-        .collect();
+    let mut tiles: Vec<Tile> = parse_tiles(&input_str).flat_map(transformations).collect();
     println!("{}", tiles.len());
     tiles.dedup();
     println!("{}", tiles.len());
@@ -355,7 +353,7 @@ fn convert_to_matrix(map: &Map, width: usize) -> Vec<Vec<Pixel>> {
     vec
 }
 
-fn search(matrix: &Matrix) -> usize {
+fn search(matrix: &[Vec<Pixel>]) -> usize {
     let sea_monster = vec![
         "                  # ".chars().collect::<Vec<char>>(),
         "#    ##    ##    ###".chars().collect::<Vec<char>>(),
@@ -365,10 +363,8 @@ fn search(matrix: &Matrix) -> usize {
     for i in 0..(matrix.len() - sea_monster.len()) {
         for j in 0..(matrix[i].len() - sea_monster[0].len()) {
             if (0..sea_monster.len()).all(|y| {
-                (0..sea_monster[y].len()).all(|x| {
-                    sea_monster[y][x] != '#'
-                        || sea_monster[y][x] == '#' && matrix[i + y][j + x] == Pixel::Hash
-                })
+                (0..sea_monster[y].len())
+                    .all(|x| sea_monster[y][x] != '#' || matrix[i + y][j + x] == Pixel::Hash)
             }) {
                 count += 1;
             }
@@ -382,11 +378,11 @@ fn print_tile(tile: &Tile) {
         for x in row {
             print!("{}", x);
         }
-        println!("");
+        println!();
     }
 }
 
-fn print_image(image: &Vec<Vec<Pixel>>) {
+fn print_image(image: &[Vec<Pixel>]) {
     for row in image {
         for p in row {
             match p {
@@ -394,7 +390,7 @@ fn print_image(image: &Vec<Vec<Pixel>>) {
                 Pixel::Dot => print!("."),
             }
         }
-        println!("")
+        println!()
     }
 }
 
@@ -403,7 +399,7 @@ fn print_map(map: &Map, width: usize) {
         for j in 0..width {
             print!("{} ", map.get(&(i as isize, j as isize)).unwrap().id);
         }
-        println!("");
+        println!();
     }
 }
 
@@ -418,7 +414,7 @@ fn get_position(map: &Map, tile_width: usize, pos: &Position) -> Pixel {
 fn print_map_content(map: &Map, width: usize, tile_width: usize) {
     for i in 0..(width * tile_width) {
         if i % tile_width == 0 {
-            println!("")
+            println!()
         }
         println!(" ");
         for j in 0..(width * tile_width) {
@@ -431,7 +427,7 @@ fn print_map_content(map: &Map, width: usize, tile_width: usize) {
             );
         }
     }
-    println!("")
+    println!()
 }
 
 pub fn star_two(mut input: impl BufRead) -> usize {
@@ -447,7 +443,7 @@ pub fn star_two(mut input: impl BufRead) -> usize {
         })
         .collect();
     let mut edge_to_tile_id = HashMap::new();
-    for (_id, tile) in &tiles {
+    for tile in tiles.values() {
         for t in transformations(tile.clone()) {
             edge_to_tile_id
                 .entry(t.left)
@@ -470,7 +466,7 @@ pub fn star_two(mut input: impl BufRead) -> usize {
 
     let mut tile_to_tile: HashMap<usize, HashSet<usize>> = HashMap::new();
 
-    for (_id, tile) in &tiles {
+    for tile in tiles.values() {
         for t in transformations(tile.clone()) {
             for id in &edge_to_tile_id[&t.left] {
                 if id != &t.id {
@@ -485,8 +481,7 @@ pub fn star_two(mut input: impl BufRead) -> usize {
 
     let (first_corner, first_neighbours) = tile_to_tile
         .iter()
-        .filter(|(_id, value)| value.len() == 2)
-        .next()
+        .find(|(_id, value)| value.len() == 2)
         .unwrap();
 
     // println!("{}", tiles.len());
@@ -502,12 +497,10 @@ pub fn star_two(mut input: impl BufRead) -> usize {
             .filter(|tile| {
                 edge_to_tile_id[&tile.right]
                     .iter()
-                    .find(|id| id == &first_neighbours[0])
-                    .is_some()
+                    .any(|id| id == first_neighbours[0])
                     && edge_to_tile_id[&tile.bottom]
                         .iter()
-                        .find(|id| id == &first_neighbours[1])
-                        .is_some()
+                        .any(|id| id == first_neighbours[1])
             })
             .map(|x| x.id)
             .collect::<Vec<usize>>()
@@ -517,12 +510,10 @@ pub fn star_two(mut input: impl BufRead) -> usize {
         .filter(|tile| {
             edge_to_tile_id[&tile.right]
                 .iter()
-                .find(|id| id == &first_neighbours[0])
-                .is_some()
+                .any(|id| id == first_neighbours[0])
                 && edge_to_tile_id[&tile.bottom]
                     .iter()
-                    .find(|id| id == &first_neighbours[1])
-                    .is_some()
+                    .any(|id| id == first_neighbours[1])
         })
         .find_map(|tile| {
             println!("Starting tile: {:?}", tile.id);
@@ -567,9 +558,9 @@ pub fn star_two(mut input: impl BufRead) -> usize {
 
     print_map_content(&map, width, tile_width);
     let image = convert_to_matrix(&map, width);
-    println!("");
+    println!();
     print_image(&image);
-    println!("");
+    println!();
 
     let hashes: usize = image
         .iter()

@@ -14,7 +14,7 @@ fn parse_line(line: String) -> Vec<Direction> {
     let mut chars: Vec<char> = line.chars().rev().collect();
     let mut directions = Vec::new();
 
-    while chars.len() > 0 {
+    while !chars.is_empty() {
         let current = chars.pop().unwrap();
         let current2 = if current == 's' || current == 'n' {
             chars.pop()
@@ -95,12 +95,12 @@ fn step(hm: HashMap<Position, Colour>) -> HashMap<Position, Colour> {
         match (hm.get(&position).unwrap_or(&Colour::White), count) {
             (Colour::Black, 1..=2) => {
                 new_tiles.insert(position, Colour::Black);
-            },
+            }
             (Colour::White, 2) => {
                 new_tiles.insert(position, Colour::Black);
-            },
-            (Colour::Black, _) => {},
-            (Colour::White, _) => {},
+            }
+            (Colour::Black, _) => {}
+            (Colour::White, _) => {}
         };
     }
     new_tiles
@@ -110,7 +110,7 @@ pub fn star_one(input: impl BufRead) -> usize {
     let tiles: Vec<Vec<Direction>> = input
         .lines()
         .filter_map(Result::ok)
-        .map(|line| parse_line(line))
+        .map(parse_line)
         .collect();
     let mut hm = HashMap::new();
     for directions in tiles {
@@ -127,7 +127,7 @@ pub fn star_two(input: impl BufRead) -> usize {
     let tiles: Vec<Vec<Direction>> = input
         .lines()
         .filter_map(Result::ok)
-        .map(|line| parse_line(line))
+        .map(parse_line)
         .collect();
     let mut hm = HashMap::new();
     for directions in tiles {

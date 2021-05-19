@@ -14,7 +14,7 @@ fn main() {
     };
     for day in days {
         println!("Day {}:", day);
-        
+
         let (star_one, star_two, filename) = get_day(day.parse::<usize>().unwrap());
         let f = fs::File::open(&filename).unwrap();
         let input = BufReader::new(f);

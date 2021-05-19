@@ -1,8 +1,6 @@
 use std::fmt::Debug;
 use std::{convert::TryFrom, fmt::Display, io::BufRead};
 
-type SeatMap = Vec<Vec<SeatStatus>>;
-
 #[derive(Copy, Clone, PartialEq)]
 enum SeatStatus {
     Floor,
@@ -45,7 +43,7 @@ impl Debug for SeatStatus {
 }
 
 fn get_new_state(
-    map: &SeatMap,
+    map: &[Vec<SeatStatus>],
     y: usize,
     x: usize,
     max_depth: usize,
@@ -60,9 +58,9 @@ fn get_new_state(
     }
 }
 
-fn step<T>(map: &SeatMap, get_new_state: T) -> SeatMap
+fn step<T>(map: &[Vec<SeatStatus>], get_new_state: T) -> Vec<Vec<SeatStatus>>
 where
-    T: Fn(&SeatMap, usize, usize) -> SeatStatus,
+    T: Fn(&[Vec<SeatStatus>], usize, usize) -> SeatStatus,
 {
     map.iter()
         .enumerate()
@@ -75,7 +73,7 @@ where
         .collect()
 }
 
-fn count_occupied(map: &SeatMap, y: usize, x: usize, max_depth: usize) -> usize {
+fn count_occupied(map: &[Vec<SeatStatus>], y: usize, x: usize, max_depth: usize) -> usize {
     let dirs: [(isize, isize); 8] = [
         (-1, -1),
         (-1, 0),
@@ -109,16 +107,16 @@ fn count_occupied(map: &SeatMap, y: usize, x: usize, max_depth: usize) -> usize 
         .count()
 }
 
-fn get_new_state_one(map: &SeatMap, y: usize, x: usize) -> SeatStatus {
+fn get_new_state_one(map: &[Vec<SeatStatus>], y: usize, x: usize) -> SeatStatus {
     get_new_state(map, y, x, 1, 4)
 }
 
-fn get_new_state_two(map: &SeatMap, y: usize, x: usize) -> SeatStatus {
+fn get_new_state_two(map: &[Vec<SeatStatus>], y: usize, x: usize) -> SeatStatus {
     get_new_state(map, y, x, map.len().max(map[0].len()) + 1, 5)
 }
 
 pub fn star_one(input: impl BufRead) -> usize {
-    let mut map: SeatMap = input
+    let mut map: Vec<Vec<SeatStatus>> = input
         .lines()
         .map(|line| {
             line.unwrap()
@@ -142,7 +140,7 @@ pub fn star_one(input: impl BufRead) -> usize {
 }
 
 pub fn star_two(input: impl BufRead) -> usize {
-    let mut map: SeatMap = input
+    let mut map: Vec<Vec<SeatStatus>> = input
         .lines()
         .map(|line| {
             line.unwrap()
@@ -168,12 +166,12 @@ pub fn star_two(input: impl BufRead) -> usize {
 #[cfg(test)]
 mod tests {
     use super::{
-        count_occupied, get_new_state_one, get_new_state_two, star_one, star_two, step, SeatMap,
-        SeatStatus, TryFrom,
+        count_occupied, get_new_state_one, get_new_state_two, star_one, star_two, step, SeatStatus,
+        TryFrom,
     };
     use std::io::Cursor;
 
-    fn get_map(input: &str) -> SeatMap {
+    fn get_map(input: &str) -> Vec<Vec<SeatStatus>> {
         input
             .lines()
             .map(|line| {
