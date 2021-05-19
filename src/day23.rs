@@ -90,7 +90,6 @@ impl<T: Copy> List<T> {
         } else {
             None
         }
-        
     }
 
     fn to_vec(&self) -> Vec<T> {
