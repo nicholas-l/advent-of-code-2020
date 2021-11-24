@@ -24,7 +24,7 @@ pub fn star_one(input: impl BufRead) -> usize {
         .fold(HashMap::new(), |mut hm, (parent, children)| {
             for child in children.split(',') {
                 let captures = RE
-                    .captures(&child)
+                    .captures(child)
                     .expect("Bad line that does not match regex.");
 
                 hm.entry(captures.name("colour").unwrap().as_str().to_string())
@@ -79,7 +79,7 @@ pub fn star_two(input: impl BufRead) -> usize {
                 .split(',')
                 .map(|child| {
                     let captures = RE
-                        .captures(&child)
+                        .captures(child)
                         .expect("Bad line that does not match regex.");
 
                     (

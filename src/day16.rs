@@ -17,7 +17,7 @@ fn get_valid_numbers(input: &str) -> HashSet<usize> {
         .lines()
         .flat_map(|line| {
             let captures = RE
-                .captures(&line)
+                .captures(line)
                 .expect("Bad line that does not match regex.");
             let min1 = captures["min1"].parse::<usize>().unwrap();
             let max1 = captures["max1"].parse::<usize>().unwrap();
@@ -52,7 +52,7 @@ fn get_field_validation(input: &str) -> HashMap<String, (usize, usize, usize, us
         .lines()
         .map(|line| {
             let captures = RE
-                .captures(&line)
+                .captures(line)
                 .expect("Bad line that does not match regex.");
             let field_name = &captures["field"];
             let min1 = captures["min1"].parse::<usize>().unwrap();

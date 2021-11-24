@@ -110,7 +110,7 @@ impl FromStr for Tile {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let mut lines = s.lines();
         let captures = RE
-            .captures(&lines.next().unwrap())
+            .captures(lines.next().unwrap())
             .expect("Bad line that does not match regex.");
         let id = captures["id"].parse::<usize>().unwrap();
         let matrix: Vec<Vec<Pixel>> = lines
@@ -240,7 +240,7 @@ fn solve<'a>(
         let position = ((depth / width) as isize, (depth % width) as isize);
         // println!("{}: Checking {}, {:?}", extra, width, depth);
         // let tmp = map.clone();
-        let ids: HashSet<_> = get_neighbour_ids(&map, &position)
+        let ids: HashSet<_> = get_neighbour_ids(map, &position)
             .iter()
             .map(|id| &tile_to_tile[id])
             .fold(None, |acc: Option<HashSet<_>>, neighbours| {
@@ -423,7 +423,7 @@ fn print_map_content(map: &Map, width: usize, tile_width: usize) {
             }
             print!(
                 "{}",
-                get_position(&map, tile_width, &(i as isize, j as isize))
+                get_position(map, tile_width, &(i as isize, j as isize))
             );
         }
     }
@@ -552,7 +552,7 @@ pub fn star_two(mut input: impl BufRead) -> usize {
     let first_corner = map.get(&(0, 0)).unwrap();
     let tile_width = first_corner.matrix.len();
 
-    print_tile(&first_corner);
+    print_tile(first_corner);
 
     print_map(&map, width);
 

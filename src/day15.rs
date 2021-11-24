@@ -20,7 +20,7 @@ fn run(input: impl BufRead, index: usize) -> usize {
     (start..)
         .scan((starting[2], map), |(last_spoken, map), i| {
             // If we have just spoken it the first time in the previous turn
-            let x = map.get(&last_spoken).unwrap();
+            let x = map.get(last_spoken).unwrap();
             let value = if let Some(later) = x.1 {
                 later - x.0
             } else {

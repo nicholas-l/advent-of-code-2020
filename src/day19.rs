@@ -73,7 +73,7 @@ fn match_rule<'a>(
             }
         }
         Rule::Ref(i) => {
-            let new_rule = map.get(&i).expect("Could not find rule in match rule");
+            let new_rule = map.get(i).expect("Could not find rule in match rule");
             match_rule(map, new_rule, input)
         }
         Rule::Alt(v) => {
