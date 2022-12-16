@@ -231,7 +231,6 @@ fn solve<'a>(
     done: &mut HashSet<usize>,
     width: usize,
     depth: usize,
-    extra: usize,
 ) -> bool {
     if depth == width * width {
         println!("Found!");
@@ -264,7 +263,7 @@ fn solve<'a>(
                     let id = tile.id;
                     done.insert(id);
                     map.insert(position, tile);
-                    if solve(map, tile_to_tile, tiles, done, width, depth + 1, extra) {
+                    if solve(map, tile_to_tile, tiles, done, width, depth + 1) {
                         return true;
                     }
                     map.remove(&position);
@@ -407,7 +406,7 @@ fn get_position(map: &Map, tile_width: usize, pos: &Position) -> Pixel {
     let tile_width = tile_width as isize;
     let i = pos.0 / tile_width;
     let j = pos.1 / tile_width;
-    let tile = map.get(&(i as isize, j as isize)).unwrap();
+    let tile = map.get(&(i, j)).unwrap();
     tile.matrix[(pos.0 - i * tile_width) as usize][(pos.1 - j * tile_width) as usize]
 }
 
@@ -534,15 +533,7 @@ pub fn star_two(mut input: impl BufRead) -> usize {
             map.insert((0, 0), tile.clone());
             let mut done = HashSet::new();
             done.insert(tile.id);
-            if solve(
-                &mut map,
-                &tile_to_tile,
-                &tiles,
-                &mut done,
-                width,
-                1,
-                tile.id,
-            ) {
+            if solve(&mut map, &tile_to_tile, &tiles, &mut done, width, 1) {
                 Some(map)
             } else {
                 None

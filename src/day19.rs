@@ -24,18 +24,14 @@ fn parse_single(input: &str) -> Rule {
 
 fn parse_rule(input: &[&str]) -> Rule {
     if input.contains(&"|") {
-        Rule::Alt(
-            input
-                .split(|x| x == &"|")
-                .map(|rule| parse_rule(rule))
-                .collect(),
-        )
+        Rule::Alt(input.split(|x| x == &"|").map(parse_rule).collect())
     } else if input.len() == 1 {
         parse_single(input[0])
     } else {
         Rule::Multiple(input.iter().map(|r| parse_single(r)).collect())
     }
 }
+
 /// This function returns None if the rule cannot match the input or Some if it can.
 /// The vector is the possible leftover input, which is important
 /// for backtracking when a branch does not complete.
@@ -93,13 +89,7 @@ fn match_rule<'a>(
 
 fn parse_rule_line(line: &str) -> (usize, Rule) {
     let index = line.split(':').next().unwrap().parse::<usize>().unwrap();
-    let rule_string: Vec<&str> = line
-        .split(':')
-        .nth(1)
-        .unwrap()
-        .trim()
-        .split_whitespace()
-        .collect();
+    let rule_string: Vec<&str> = line.split(':').nth(1).unwrap().split_whitespace().collect();
     let rule = parse_rule(&rule_string[..]);
     (index, rule)
 }

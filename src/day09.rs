@@ -22,7 +22,7 @@ fn xmas2(numbers: &[usize], value: usize) -> Option<Vec<usize>> {
     for k in 2..numbers.len() {
         for p in numbers.windows(k) {
             if p.iter().sum::<usize>() == value {
-                return Some(p.iter().copied().collect());
+                return Some(p.to_vec());
             }
         }
     }
