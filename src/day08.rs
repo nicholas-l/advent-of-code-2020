@@ -35,7 +35,7 @@ enum Error {
 pub fn star_one(input: impl BufRead) -> usize {
     let instructions: Vec<Instruction> = input
         .lines()
-        .filter_map(Result::ok)
+        .map_while(Result::ok)
         .map(|x| x.parse().unwrap())
         .collect();
 
@@ -79,7 +79,7 @@ fn run(instructions: &[Instruction], flip: usize) -> Result<usize, Error> {
 pub fn star_two(input: impl BufRead) -> usize {
     let instructions: Vec<Instruction> = input
         .lines()
-        .filter_map(Result::ok)
+        .map_while(Result::ok)
         .map(|x| x.parse().unwrap())
         .collect();
     instructions
@@ -88,8 +88,7 @@ pub fn star_two(input: impl BufRead) -> usize {
         // Remove acculumator instructions
         .filter(|(_index, instruction)| !matches!(instruction, Instruction::Accumulate(_)))
         .map(|x| x.0)
-        .filter_map(|index| run(&instructions, index).ok())
-        .next()
+        .find_map(|index| run(&instructions, index).ok())
         .unwrap()
 }
 

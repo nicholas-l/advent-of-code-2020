@@ -239,7 +239,7 @@ test";
         let (_, rules) = parse_input(Cursor::new(INPUT), Some(overrides));
         let test: Vec<char> = "babbbbaabbbbbabbbbbbaabaaabaaa".chars().collect();
         let output = match_rule(&rules, rules.get(&0).unwrap(), &test[..]);
-        assert_eq!(output.map(|r| r.iter().any(|r| r.len() == 0)), Some(true));
+        assert_eq!(output.map(|r| r.iter().any(|r| r.is_empty())), Some(true));
     }
 
     #[test]

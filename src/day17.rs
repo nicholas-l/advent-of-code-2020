@@ -166,7 +166,7 @@ fn step2(state: Vec<Vec<Vec<Vec<Cube>>>>) -> Vec<Vec<Vec<Vec<Cube>>>> {
 fn parse_state(input: impl BufRead) -> State {
     let numbers: Vec<Vec<Cube>> = input
         .lines()
-        .filter_map(Result::ok)
+        .map_while(Result::ok)
         .map(|line| line.chars().map(|c| Cube::try_from(c).unwrap()).collect())
         .collect();
     vec![numbers]

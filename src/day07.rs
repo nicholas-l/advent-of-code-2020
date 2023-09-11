@@ -11,7 +11,7 @@ lazy_static! {
 pub fn star_one(input: impl BufRead) -> usize {
     let hashmap = input
         .lines()
-        .filter_map(Result::ok)
+        .map_while(Result::ok)
         .map(|x| {
             let mut iter = x.splitn(2, " bags contain ");
             let parent = iter.next().unwrap();
@@ -64,7 +64,7 @@ fn get_number_of_bags(map: &HashMap<String, Vec<(String, usize)>>, id: &str) -> 
 pub fn star_two(input: impl BufRead) -> usize {
     let hashmap: HashMap<_, Vec<(String, usize)>> = input
         .lines()
-        .filter_map(Result::ok)
+        .map_while(Result::ok)
         .map(|x| {
             let mut iter = x.splitn(2, " bags contain ");
             let parent = iter.next().unwrap();

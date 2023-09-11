@@ -14,8 +14,7 @@ fn parse_line(line: String) -> Vec<Direction> {
     let mut chars: Vec<char> = line.chars().rev().collect();
     let mut directions = Vec::new();
 
-    while !chars.is_empty() {
-        let current = chars.pop().unwrap();
+    while let Some(current) = chars.pop() {
         let current2 = if current == 's' || current == 'n' {
             chars.pop()
         } else {
@@ -109,7 +108,7 @@ fn step(hm: HashMap<Position, Colour>) -> HashMap<Position, Colour> {
 pub fn star_one(input: impl BufRead) -> usize {
     let tiles: Vec<Vec<Direction>> = input
         .lines()
-        .filter_map(Result::ok)
+        .map_while(Result::ok)
         .map(parse_line)
         .collect();
     let mut hm = HashMap::new();
@@ -126,7 +125,7 @@ pub fn star_one(input: impl BufRead) -> usize {
 pub fn star_two(input: impl BufRead) -> usize {
     let tiles: Vec<Vec<Direction>> = input
         .lines()
-        .filter_map(Result::ok)
+        .map_while(Result::ok)
         .map(parse_line)
         .collect();
     let mut hm = HashMap::new();

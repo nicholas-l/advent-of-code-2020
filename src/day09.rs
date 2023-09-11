@@ -32,7 +32,7 @@ fn xmas2(numbers: &[usize], value: usize) -> Option<Vec<usize>> {
 pub fn star_one(input: impl BufRead) -> usize {
     let numbers: Vec<usize> = input
         .lines()
-        .filter_map(Result::ok)
+        .map_while(Result::ok)
         .map(|x| x.parse().unwrap())
         .collect();
     xmas(&numbers, 25)
@@ -41,7 +41,7 @@ pub fn star_one(input: impl BufRead) -> usize {
 pub fn star_two(input: impl BufRead) -> usize {
     let numbers: Vec<usize> = input
         .lines()
-        .filter_map(Result::ok)
+        .map_while(Result::ok)
         .map(|x| x.parse().unwrap())
         .collect();
     let values = xmas2(&numbers, xmas(&numbers, 25)).unwrap();

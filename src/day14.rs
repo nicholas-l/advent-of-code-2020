@@ -114,7 +114,7 @@ fn set_addresses(address: Vec<MaskPoint>, mut set: impl FnMut(usize)) {
 }
 
 fn parse_input(input: impl BufRead) -> impl Iterator<Item = Instruction> {
-    input.lines().filter_map(Result::ok).map(|line| {
+    input.lines().map_while(Result::ok).map(|line| {
         let firstchars: String = line.chars().take(3).collect();
         match firstchars.as_str() {
             "mas" => Instruction::Mask(

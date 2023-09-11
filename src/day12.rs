@@ -122,7 +122,7 @@ pub fn star_one(input: impl BufRead) -> usize {
     };
     for action in input
         .lines()
-        .filter_map(Result::ok)
+        .map_while(Result::ok)
         .map(|line| line.parse::<Action>().unwrap())
     {
         ship.step(action);
@@ -139,7 +139,7 @@ pub fn star_two(input: impl BufRead) -> usize {
     let mut waypoint = (1, 10);
     for action in input
         .lines()
-        .filter_map(Result::ok)
+        .map_while(Result::ok)
         .map(|line| line.parse::<Action>().unwrap())
     {
         waypoint = ship.step2(action, waypoint);

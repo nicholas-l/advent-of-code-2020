@@ -4,7 +4,7 @@ use std::io::BufRead;
 pub fn star_one(input: impl BufRead) -> usize {
     let mut data: Vec<usize> = input
         .lines()
-        .filter_map(Result::ok)
+        .map_while(Result::ok)
         .map(|line| line.trim().parse().unwrap())
         .collect();
     data.sort_unstable();
@@ -44,7 +44,7 @@ fn number_to_target(cache: &HashMap<usize, usize>, current: usize, target: usize
 pub fn star_two(input: impl BufRead) -> usize {
     let mut data: Vec<usize> = input
         .lines()
-        .filter_map(Result::ok)
+        .map_while(Result::ok)
         .map(|line| line.trim().parse().unwrap())
         .collect();
     data.sort_unstable();

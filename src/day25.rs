@@ -24,7 +24,7 @@ fn create_encryption_key(subject_number: usize, loops: usize) -> usize {
 pub fn star_one(input: impl BufRead) -> usize {
     let pkeys: Vec<usize> = input
         .lines()
-        .filter_map(Result::ok)
+        .map_while(Result::ok)
         .map(|x| x.parse::<usize>().unwrap())
         .collect();
     let loops: Vec<usize> = pkeys.iter().map(|pkey| get_loop_size(*pkey, 7)).collect();

@@ -15,7 +15,7 @@ pub fn star_one(input: impl BufRead) -> usize {
     let mut i = HashSet::new();
     let data: Vec<(Vec<String>, Vec<String>)> = input
         .lines()
-        .filter_map(Result::ok)
+        .map_while(Result::ok)
         .map(|line| {
             let captures = RE.captures(&line).unwrap();
             let allergens = captures["allergens"]
@@ -55,8 +55,7 @@ pub fn star_one(input: impl BufRead) -> usize {
     possible_labels.sort_by_key(|x| Reverse(x.1.len()));
 
     let mut labels = HashMap::new();
-    while !possible_labels.is_empty() {
-        let (allergen, possible_ing) = possible_labels.pop().unwrap();
+    while let Some((allergen, possible_ing)) = possible_labels.pop() {
         if possible_ing.len() != 1 {
             panic!(
                 "Possible ingredients are not 1!: {:?}: {:?} ({:?})",
@@ -88,7 +87,7 @@ pub fn star_two(input: impl BufRead) -> usize {
     let mut i = HashSet::new();
     let data: Vec<(Vec<String>, Vec<String>)> = input
         .lines()
-        .filter_map(Result::ok)
+        .map_while(Result::ok)
         .map(|line| {
             let captures = RE.captures(&line).unwrap();
             let allergens = captures["allergens"]
@@ -128,8 +127,7 @@ pub fn star_two(input: impl BufRead) -> usize {
     possible_labels.sort_by_key(|x| Reverse(x.1.len()));
 
     let mut labels = HashMap::new();
-    while !possible_labels.is_empty() {
-        let (allergen, possible_ing) = possible_labels.pop().unwrap();
+    while let Some((allergen, possible_ing)) = possible_labels.pop() {
         if possible_ing.len() != 1 {
             panic!("Possible ingredients are not 1!");
         }
