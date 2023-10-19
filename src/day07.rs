@@ -21,18 +21,21 @@ pub fn star_one(input: impl BufRead) -> usize {
             (parent.to_string(), children.to_string())
         })
         .filter(|(_parent, children)| children != "no other bags.")
-        .fold(HashMap::new(), |mut hm, (parent, children)| {
-            for child in children.split(',') {
-                let captures = RE
-                    .captures(child)
-                    .expect("Bad line that does not match regex.");
+        .fold(
+            HashMap::new(),
+            |mut hm: HashMap<String, Vec<String>>, (parent, children)| {
+                for child in children.split(',') {
+                    let captures = RE
+                        .captures(child)
+                        .expect("Bad line that does not match regex.");
 
-                hm.entry(captures.name("colour").unwrap().as_str().to_string())
-                    .or_insert_with(Vec::new)
-                    .push(parent.trim().to_string());
-            }
-            hm
-        });
+                    hm.entry(captures.name("colour").unwrap().as_str().to_string())
+                        .or_default()
+                        .push(parent.trim().to_string());
+                }
+                hm
+            },
+        );
     let mut stack = vec!["shiny gold"];
     let mut visited = HashSet::new();
     while let Some(node) = stack.pop() {

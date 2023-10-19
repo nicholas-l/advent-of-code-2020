@@ -314,10 +314,7 @@ pub fn star_one(mut input: impl BufRead) -> usize {
     for tile in &tiles {
         for x in &edge_to_tile_id[&tile.left] {
             if x.id != tile.id {
-                tile_tile
-                    .entry(tile.id)
-                    .or_insert_with(HashSet::new)
-                    .insert(x.id);
+                tile_tile.entry(tile.id).or_default().insert(x.id);
             }
         }
     }
@@ -469,10 +466,7 @@ pub fn star_two(mut input: impl BufRead) -> usize {
         for t in transformations(tile.clone()) {
             for id in &edge_to_tile_id[&t.left] {
                 if id != &t.id {
-                    tile_to_tile
-                        .entry(t.id)
-                        .or_insert_with(HashSet::new)
-                        .insert(*id);
+                    tile_to_tile.entry(t.id).or_default().insert(*id);
                 }
             }
         }
