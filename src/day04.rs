@@ -77,18 +77,6 @@ impl FromStr for Length {
             })?
     }
 }
-#[derive(Debug)]
-enum Colour {
-    Rgb(usize, usize, usize),
-}
-
-impl FromStr for Colour {
-    type Err = String;
-
-    fn from_str(_s: &str) -> Result<Self, Self::Err> {
-        Ok(Colour::Rgb(0, 0, 0))
-    }
-}
 
 #[derive(Debug)]
 struct Passport {

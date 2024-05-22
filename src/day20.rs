@@ -350,7 +350,7 @@ fn convert_to_matrix(map: &Map, width: usize) -> Vec<Vec<Pixel>> {
 }
 
 fn search(matrix: &[Vec<Pixel>]) -> usize {
-    let sea_monster = vec![
+    let sea_monster = [
         "                  # ".chars().collect::<Vec<char>>(),
         "#    ##    ##    ###".chars().collect::<Vec<char>>(),
         " #  #  #  #  #  #   ".chars().collect::<Vec<char>>(),
