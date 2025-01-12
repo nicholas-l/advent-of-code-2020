@@ -323,11 +323,11 @@ pub fn star_one(mut input: impl BufRead) -> usize {
         println!("{:?}", tile);
     }
 
-    return tile_tile
+    tile_tile
         .iter()
         .filter(|(_key, value)| value.len() == 2)
         .map(|(key, _value)| *key)
-        .product();
+        .product()
 }
 
 fn convert_to_matrix(map: &Map, width: usize) -> Vec<Vec<Pixel>> {
